@@ -141,25 +141,25 @@ package body dui is
         begin
 
             for C in LOT.Iterate loop
-                declare
-                    w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
+                --declare
+                    --w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
                 begin
                     --480x272
-                    if w.x < 0 or w.x > (480 - w.w) then
-                        w.x := 0;
-                    end if;
-                    if w.y < 0 or w.y > (272 - w.h) then
-                        w.y := 0;
-                    end if;
-                    STM32.Board.Display.Hidden_Buffer (1).Set_Source (w.bgd);
-                    STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-                       (Area =>
-                           (Position => (w.x, w.y), Width => w.w,
-                            Height   => w.h));
+                    --  if w.x < 0 or w.x > (480 - w.w) then
+                    --      w.x := 0;
+                    --  end if;
+                    --  if w.y < 0 or w.y > (272 - w.h) then
+                    --      w.y := 0;
+                    --  end if;
+                    Layout_Object_Tree.Element (c).Draw (img => STM32.Board.Display.Hidden_Buffer(1).all);
+                    --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (w.bgd);
+                    --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
+                    --     (Area =>
+                    --         (Position => (w.x, w.y), Width => w.w,
+                    --          Height   => w.h));
                 end;
             end loop;
             STM32.Board.Display.Update_Layer (1);
-            --Layout_Object_Tree.Element (c).Draw (target);
         end render_node;
 
         --      procedure test (c : Layout_Object_Tree.Cursor) is
