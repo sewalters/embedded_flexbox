@@ -51,8 +51,8 @@ package Widget is
       buoy     : buoy_t   := space_nothing;
       expand_h : expand_t := (behavior => max);
       expand_w : expand_t := (behavior => max);
-      gap_r : gap_t := (behavior => max);
-      gap_c : gap_t := (behavior => max);
+      gap_r : gap_t := (pixel, 0);
+      gap_c : gap_t := (pixel, 0);
    end record;
 
    default_flex : flex_t := (others => <>);
