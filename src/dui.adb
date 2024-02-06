@@ -849,98 +849,107 @@ package body dui is
                     --      end loop;
                     --  end calculate_gap;
 
-                    --  procedure calculate_align is
-                    --      next_x : Natural :=
-                    --         LOT_Parent
-                    --            .x; -- variable to calculate the next x-coord of siblings when calculating left alignment
-                    --      next_y : Natural :=
-                    --         LOT_Parent
-                    --            .y; -- variable to calculate the next y-coord of siblings when calculating left alignment
-                    --  begin
-                    --      align_wh := LOT_Parent.child_flex.align;
-                    --      case align_wh is
-                    --          when stretch =>
-                    --              for i in Layout_Object_Tree.Iterate_Children (LOT, c)
-                    --              loop
-                    --                  case LOT_Parent.child_flex.dir is
-                    --                      when left_right | right_left =>
-                    --                          LOT (i).h := LOT_ph;
+                    procedure calculate_align is
+                        next_x : Natural :=
+                           LOT_Parent
+                              .x; -- variable to calculate the next x-coord of siblings when calculating left alignment
+                        next_y : Natural :=
+                           LOT_Parent
+                              .y; -- variable to calculate the next y-coord of siblings when calculating left alignment
+                    begin
+                        align_wh := LOT_Parent.child_flex.align;
+                        case align_wh is
+                            when stretch =>
+                                for i in Layout_Object_Tree.Iterate_Children (LOT, c)
+                                loop
+                                    case LOT_Parent.child_flex.dir is
+                                        when left_right | right_left =>
+                                            LOT (i).h := LOT_ph;
 
-                    --                      when bottom_top | top_bottom =>
-                    --                          LOT (i).w := LOT_pw;
+                                        when bottom_top | top_bottom =>
+                                            LOT (i).w := LOT_pw;
 
-                    --                      when others =>
-                    --                          null;
-                    --                  end case;
-                    --              end loop;
+                                        when others =>
+                                            null;
+                                    end case;
+                                end loop;
 
-                    --          when center =>
-                    --              for i in Layout_Object_Tree.Iterate_Children (LOT, c)
-                    --              loop
-                    --                  case LOT_Parent.child_flex.dir is
-                    --                      when left_right | right_left =>
-                    --                          LOT (i).y := (LOT_ph - LOT (i).h) / 2;
+                            when center =>
+                                for i in Layout_Object_Tree.Iterate_Children (LOT, c)
+                                loop
+                                    case LOT_Parent.child_flex.dir is
+                                        when left_right | right_left =>
+                                            LOT (i).y := (LOT_ph - LOT (i).h) / 2;
 
-                    --                      when bottom_top | top_bottom =>
-                    --                          LOT (i).x := LOT_pw + LOT (i).w;
+                                        when bottom_top | top_bottom =>
+                                            LOT (i).x := (LOT_pw / 2) - (LOT (i).w / 2);
 
-                    --                      when others =>
-                    --                          null;
-                    --                  end case;
-                    --              end loop;
+                                        when others =>
+                                            null;
+                                    end case;
+                                end loop;
 
-                    --          when bottom =>
-                    --              for i in Layout_Object_Tree.Iterate_Children (LOT, c)
-                    --              loop
-                    --                  LOT (i).y := LOT_ph - LOT_oy;
-                    --              end loop;
+                            when bottom =>
+                                next_y := LOT_ph;
+                                for i in Layout_Object_Tree.Iterate_Children (LOT, c)
+                                loop
+                                    case LOT_Parent.child_flex.dir is
+                                        when left_right | right_left =>
+                                            LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
 
-                    --              --  when top =>
-                    --              --      for i in Layout_Object_Tree.Iterate_Children (LOT, C)
-                    --              --          loop
-                    --              --              LOT (i).y := LOT_ph + Lot (i).h;
-                    --              --          end loop;
+                                        when bottom_top | top_bottom =>
+                                            next_y := next_y - LOT (i).h;
+                                            LOT (i).y := next_y;
+                                            
+                                        when others =>
+                                            null;
+                                    end case;
+                                end loop;
 
-                    --          when left =>
-                    --              for i in Layout_Object_Tree.Iterate_Children (LOT, c)
-                    --              loop
-                    --                  case LOT_Parent.child_flex.dir is
-                    --                      when left_right | right_left =>
-                    --                          LOT (i).x := next_x;
-                    --                          next_x    := next_x + LOT (i).w;
+                            when left =>
+                                for i in Layout_Object_Tree.Iterate_Children (LOT, c)
+                                loop
+                                    case LOT_Parent.child_flex.dir is
+                                        when left_right | right_left =>
+                                            LOT (i).x := next_x;
+                                            next_x    := next_x + LOT (i).w;
 
-                    --                      when top_bottom | bottom_top =>
-                    --                          LOT (i).x := LOT_Parent.x;
-                    --                          LOT (i).y := next_y;
-                    --                          next_y    := next_y + LOT (i).h;
+                                        when top_bottom | bottom_top =>
+                                            LOT (i).x := LOT_Parent.x;
+                                            LOT (i).y := next_y;
+                                            next_y    := next_y + LOT (i).h;
 
-                    --                      when others =>
-                    --                          null;
-                    --                  end case;
-                    --              end loop;
+                                        when others =>
+                                            null;
+                                    end case;
+                                end loop;
 
-                    --          when right =>
-                    --              for i in Layout_Object_Tree.Iterate_Children (LOT, c)
-                    --              loop
-                    --                  case LOT_Parent.child_flex.dir is
-                    --                      when left_right | right_left =>
-                    --                          LOT (i).x := next_x;
-                    --                          next_x    := next_x + LOT (i).w;
+                            when right =>
+                                next_x := LOT_Parent.x + LOT_Parent.w;
+                                for i in Layout_Object_Tree.Iterate_Children (LOT, c)
+                                loop
+                                    case LOT_Parent.child_flex.dir is
+                                        when left_right | right_left =>
+                                            next_x := next_x - LOT (i).w;
 
-                    --                      when top_bottom | bottom_top =>
-                    --                          LOT (i).x :=
-                    --                             LOT_Parent.x + LOT_Parent.w - LOT (i).w;
-                    --                          LOT (i).y := next_y;
-                    --                          next_y    := next_y + LOT (i).h;
+                                            if next_x >= LOT_Parent.x then
+                                                LOT (i).x := next_x;
+                                            
+                                            end if;
 
-                    --                      when others =>
-                    --                          null;
-                    --                  end case;
-                    --              end loop;
-                    --          when others =>
-                    --              null; -- Currently not handling other alignment types
-                    --      end case;
-                    --  end calculate_align;
+                                        when top_bottom | bottom_top =>
+                                            LOT (i).x := LOT_Parent.x + LOT_Parent.w - LOT (i).w;
+                                            LOT (i).y := next_y;
+                                            next_y    := next_y + LOT (i).h;
+
+                                        when others =>
+                                            null;
+                                    end case;
+                                end loop;
+                            when others =>
+                                null; -- Currently not handling other alignment types
+                        end case;
+                    end calculate_align;
 
         begin
             if cc > 0 then
@@ -950,7 +959,7 @@ package body dui is
                     if cc > 1 then
                         calculate_buoy; -- Procedure call recalculates (x,y) coordinates of child widgets to apply buoyancy format
                         --calculate_gap; -- Procedure call recalculates (x,y) coordinates of child widgets to apply gap size
-                        --calculate_align;
+                        calculate_align;
                     end if;
                 end;
             end if;
@@ -1015,7 +1024,7 @@ begin
     main_widget :=
        new Widget.Instance'
           (Controlled with id => +"main",
-           child_flex => (dir => top_bottom, others => <>),bgd => HAL.Bitmap.Grey, others => <>);
+           child_flex => (dir => top_bottom, gap_r => (pixel, 15), others => <>),bgd => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);
     --font.font_1_img := g.Load_QOI ("data/font_1.qoi");
