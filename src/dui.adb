@@ -218,17 +218,20 @@ package body dui is
                                 total_portion :=
                                    total_portion + expand_w.portion;
                             when pixel =>
-                                width_pixel_left :=
-                                   width_pixel_left - expand_w.pixel;
+                                if expand_w.pixel <= width_pixel_left then
+                                    width_pixel_left :=
+                                        width_pixel_left - expand_w.pixel;
+                                else
+                                    width_pixel_left := 0;
+                                end if;
                             when percent =>
-                                width_pixel_left :=
-                                   width_pixel_left -
-                                   Natural
-                                      (float (LOT_Parent.w) *
-                                       float(expand_w.percent));
+                                if (Natural(float (LOT_Parent.w) * float(expand_w.percent))) <= width_pixel_left then
+                                width_pixel_left := width_pixel_left -Natural(float (LOT_Parent.w) * float(expand_w.percent));
+                                else
+                                    width_pixel_left := 0;
+                                end if;
                             when content =>
-                                width_pixel_left :=
-                                   width_pixel_left - LOT (i).w;
+                                null;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -239,17 +242,20 @@ package body dui is
                                 total_portion :=
                                    total_portion + expand_h.portion;
                             when pixel =>
-                                height_pixel_left :=
-                                   height_pixel_left - expand_h.pixel;
+                                if expand_h.pixel <= height_pixel_left then
+                                    height_pixel_left :=
+                                        height_pixel_left - expand_h.pixel;
+                                else
+                                    height_pixel_left := 0;
+                                end if;
                             when percent =>
-                                height_pixel_left :=
-                                   height_pixel_left -
-                                   Natural
-                                      (float (LOT_Parent.h) *
-                                       float(expand_h.percent));
+                                if (Natural(float (LOT_Parent.h) * float(expand_h.percent))) <= height_pixel_left then
+                                    height_pixel_left := height_pixel_left - Natural(float (LOT_Parent.h) * float(expand_h.percent));
+                                else
+                                    height_pixel_left := 0;
+                                end if;
                             when content =>
-                                height_pixel_left :=
-                                   height_pixel_left - LOT (i).h;
+                                null;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -260,6 +266,7 @@ package body dui is
             end calculate_portions;
 
             procedure calculate_children_coordinates is
+                left_boundary, right_boundary, top_boundary, bottom_boundary : Natural;
             begin
                 for i in Layout_Object_Tree.Iterate_Children (LOT, c) loop
                     if LOT_Parent.child_flex.dir = right_left then
@@ -276,9 +283,17 @@ package body dui is
                     end if;
                     expand_w := LOT (i).self_flex.expand_w;
                     expand_h := LOT (i).self_flex.expand_h;
+
+                    -- Dom approach, take the time to directly allocate boundaries.
+                    left_boundary := LOT_Parent.x;
+                    right_boundary := LOT_Parent.x + LOT_Parent.w;
+                    top_boundary := LOT_Parent.y;
+                    bottom_boundary := LOT_Parent.y + LOT_Parent.h;
+
                     if child_row then
 
-                        if LOT_ox < 480 then
+                        if LOT_ox < right_boundary then
+
                         case expand_w.behavior is -- update w in row context
                             when portion =>
                                 LOT (i).all.Set_Width
@@ -312,28 +327,42 @@ package body dui is
                             when max =>
                                 LOT (i).all.Set_Height (LOT_Parent.h);
                         end case;
+
+                        if (LOT_ox + LOT(i).w + gap_c) > right_boundary then
+                            --Overflow is occuring. First check if overflow occurs with or without gap.
+                            if (Lot_ox + LOT(i).w) > right_boundary then --Checking if overflow occurs without gap.
+                                --If it does, then we resize widget to fit remaining space.
+                                LOT(i).w := right_boundary - LOT_ox;
+                            end if;
+
+                            LOT_ox := right_boundary; -- Resolve overflow by setting offset to boundary to signal remaining widgets to zero out.
                         else
-                            LOT(i).x := 0;
+                            LOT_ox := LOT_ox + LOT(i).w + gap_c; --If overflow has yet to occur, continue shifting offset.
+                        end if;
+
+                        else
+                            LOT(i).x := 0; --If overflow occured in a previous widget, zero out this widget.
                             LOT(i).y := 0;
-                            LOT(i).w := 0; --If LOT_ox >= 480, overflow occured. We simple zero out remaining widgets for now...
+                            LOT(i).w := 0; 
                             LOT(i).h := 0;
                         end if;
 
-                        if LOT_ox >= 480 then
-                            null;
-                        elsif LOT_ox + LOT(i).w + gap_c > 480 then
-                             --Overflow occuring, need to provide remaining width to current widget, set LOT_ox to 480.
-                             LOT(i).w := (LOT_pw + LOT_Parent.x) - LOT_ox;
-                             LOT_ox := 480;
-                        elsif LOT_ox + LOT(i).w + gap_c <= 480 then
-                            LOT_ox := LOT_ox + LOT (i).w + gap_c;
-                        else
-                            null;
-                        end if;
+                        --  if LOT_ox >= 480 then
+                        --      null;
+                        --  elsif LOT_ox + LOT(i).w + gap_c > 480 then
+                        --       --Overflow occuring, need to provide remaining width to current widget, set LOT_ox to 480.
+                        --       LOT(i).w := (LOT_pw + LOT_Parent.x) - LOT_ox;
+                        --       LOT_ox := 480;
+                        --  elsif LOT_ox + LOT(i).w + gap_c <= 480 then
+                        --      LOT_ox := LOT_ox + LOT (i).w + gap_c;
+                        --  else
+                        --      null;
+                        --  end if;
 
                     elsif child_column then
 
-                        if LOT_oy < 272 then
+                        if LOT_oy < bottom_boundary then
+
                         case expand_h.behavior is -- update h in column context
                             when portion =>
                                 LOT (i).all.Set_Height
@@ -367,6 +396,20 @@ package body dui is
                             when max =>
                                 LOT (i).all.Set_Width (LOT_Parent.w);
                         end case;
+
+                        if (LOT_oy + LOT(i).h + gap_r) > bottom_boundary then
+                            --Overflow occuring, first check if it occurs with or without gap.
+                            if(Lot_oy + LOT(i).h) > bottom_boundary then
+                                --If it does, resize widget to fill remaining space.
+                                LOT(i).h := bottom_boundary - LOT_oy;
+                            end if;
+
+                            LOT_oy := bottom_boundary; --set offset to boundary, signaling remaining widgets to zero out.
+
+                        else
+                            LOT_oy := LOT_oy + LOT(i).h + gap_r; --O If no overflow, continue shifitng offset.
+                        end if;
+
                         else
                             LOT(i).x := 0;
                             LOT(i).y := 0;
@@ -374,17 +417,17 @@ package body dui is
                             LOT(i).h := 0;
                         end if;
 
-                        if LOT_oy > 272 then
-                            null;
-                        else
-                            if LOT_oy + LOT(i).h + gap_r <= 272 then
-                                LOT_oy := LOT_oy + LOT (i).h + gap_r;
-                            elsif LOT_oy + LOT(i).h + gap_r > 272 then
-                                --Overflow occured, provide remainder of height to current child and zero out any remaining children.
-                                LOT(i).h := (LOT_ph + LOT_Parent.y) - LOT_oy;
-                                LOT_oy := 273;
-                            end if;
-                        end if;
+                        --  if LOT_oy > 272 then
+                        --      null;
+                        --  else
+                        --      if LOT_oy + LOT(i).h + gap_r <= 272 then
+                        --          LOT_oy := LOT_oy + LOT (i).h + gap_r;
+                        --      elsif LOT_oy + LOT(i).h + gap_r > 272 then
+                        --          --Overflow occured, provide remainder of height to current child and zero out any remaining children.
+                        --          LOT(i).h := (LOT_ph + LOT_Parent.y) - LOT_oy;
+                        --          LOT_oy := 273;
+                        --      end if;
+                        --  end if;
 
                     elsif child_depth then
                         null;
@@ -566,289 +609,6 @@ package body dui is
                 end case;
             end calculate_buoy;
 
-                    --  procedure calculate_gap is
-                    --      next_sib     : Layout_Object_Tree.Cursor;
-                    --      prev_sib     : Layout_Object_Tree.Cursor;
-                    --      modulo_check : Natural;
-                    --      midpoint     : Natural;
-                    --      curr_gap     : Natural;
-                    --      new_gap      : Natural;
-                    --      counter      : Natural := 1;
-                    --  begin
-                    --      for i in Layout_Object_Tree.Iterate_Children (LOT, c) loop
-                    --          if child_row then
-                    --              gap_c := LOT_Parent.child_flex.gap_c;
-                    --              case gap_c.behavior is
-                    --                  when pixel =>
-                    --                      new_gap := gap_c.pixel;
-                    --                  when percent =>
-                    --                      new_gap :=
-                    --                         Natural
-                    --                            (float (LOT_Parent.w) *
-                    --                             gap_c.percent);
-                    --                  when others =>
-                    --                      counter := 0;
-                    --              end case;
-                    --              if counter > 0 then
-                    --                  if counter > cc then
-                    --                      counter := 1;
-                    --                  end if;
-                    --                  modulo_check := cc mod 2;
-                    --                  midpoint     := cc / 2 + modulo_check;
-                    --                  next_sib := Layout_Object_Tree.Next_Sibling (i);
-                    --                  prev_sib     :=
-                    --                     Layout_Object_Tree.Previous_Sibling (i);
-                    --                  if LOT_Parent.child_flex.dir = left_right then
-                    --                      if LOT_Parent.child_flex.buoy = space_between
-                    --                      then -- image compression not implemented yet; doesn't overlap (under?)
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (next_sib)
-                    --                          then
-                    --                              curr_gap :=
-                    --                                 LOT (next_sib).x - LOT (i).x -
-                    --                                 LOT (i).w;
-                    --                              if curr_gap < new_gap then
-                    --                                  LOT (next_sib).x :=
-                    --                                     LOT (next_sib).x + new_gap -
-                    --                                     curr_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      elsif LOT_Parent.child_flex.buoy =
-                    --                         space_around or
-                    --                         LOT_Parent.child_flex.buoy = space_evenly
-                    --                      then
-                    --                          if modulo_check = 0 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x -
-                    --                                     (midpoint - counter) * new_gap -
-                    --                                     new_gap mod 2 - new_gap / 2;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x +
-                    --                                     (counter - midpoint - 1) *
-                    --                                        new_gap +
-                    --                                     new_gap / 2;
-                    --                              else
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x - new_gap mod 2 -
-                    --                                     new_gap / 2;
-                    --                              end if;
-                    --                          elsif modulo_check = 1 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x -
-                    --                                     (midpoint - counter) * new_gap;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x +
-                    --                                     (counter - midpoint) * new_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      else
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (next_sib)
-                    --                          then
-                    --                              LOT (next_sib).x :=
-                    --                                 LOT (i).x + LOT (i).w + new_gap;
-                    --                          end if;
-                    --                      end if;
-                    --                  else
-                    --                      if LOT_Parent.child_flex.buoy = space_between
-                    --                      then -- image compression not implemented yet; causes overlap
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (prev_sib)
-                    --                          then
-                    --                              curr_gap :=
-                    --                                 LOT (prev_sib).x - LOT (i).x -
-                    --                                 LOT (i).w;
-                    --                              if curr_gap < new_gap then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x - new_gap + curr_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      elsif LOT_Parent.child_flex.buoy =
-                    --                         space_around or
-                    --                         LOT_Parent.child_flex.buoy = space_evenly
-                    --                      then
-                    --                          if modulo_check = 0 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x +
-                    --                                     (midpoint - counter) * new_gap +
-                    --                                     new_gap mod 2 + new_gap / 2;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x -
-                    --                                     (counter - midpoint - 1) *
-                    --                                        new_gap -
-                    --                                     new_gap / 2;
-                    --                              else
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x + new_gap mod 2 +
-                    --                                     new_gap / 2;
-                    --                              end if;
-                    --                          elsif modulo_check = 1 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x +
-                    --                                     (midpoint - counter) * new_gap;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).x :=
-                    --                                     LOT (i).x -
-                    --                                     (counter - midpoint) * new_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      else
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (prev_sib)
-                    --                          then
-                    --                              LOT (i).x :=
-                    --                                 LOT (prev_sib).x - LOT (i).w -
-                    --                                 new_gap;
-                    --                          end if;
-                    --                      end if;
-                    --                  end if;
-                    --              end if;
-                    --          elsif child_column then
-                    --              gap_r := LOT_Parent.child_flex.gap_r;
-                    --              case gap_r.behavior is
-                    --                  when pixel =>
-                    --                      new_gap := gap_r.pixel;
-                    --                  when percent =>
-                    --                      new_gap :=
-                    --                         Natural
-                    --                            (float (LOT_Parent.h) *
-                    --                             gap_r.percent);
-                    --                  when others =>
-                    --                      counter := 0;
-                    --              end case;
-                    --              if counter > 0 then
-                    --                  if counter > cc then
-                    --                      counter := 1;
-                    --                  end if;
-                    --                  modulo_check := cc mod 2;
-                    --                  midpoint     := cc / 2 + modulo_check;
-                    --                  next_sib := Layout_Object_Tree.Next_Sibling (i);
-                    --                  prev_sib     :=
-                    --                     Layout_Object_Tree.Previous_Sibling (i);
-                    --                  if LOT_Parent.child_flex.dir = top_bottom then
-                    --                      if LOT_Parent.child_flex.buoy = space_between
-                    --                      then
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (next_sib)
-                    --                          then
-                    --                              curr_gap :=
-                    --                                 LOT (next_sib).y - LOT (i).y -
-                    --                                 LOT (i).h;
-                    --                              if curr_gap < new_gap then
-                    --                                  LOT (next_sib).y :=
-                    --                                     LOT (next_sib).y + new_gap -
-                    --                                     curr_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      elsif LOT_Parent.child_flex.buoy =
-                    --                         space_around or
-                    --                         LOT_Parent.child_flex.buoy = space_evenly
-                    --                      then
-                    --                          if modulo_check = 0 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y -
-                    --                                     (midpoint - counter) * new_gap -
-                    --                                     new_gap mod 2 - new_gap / 2;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y +
-                    --                                     (counter - midpoint - 1) *
-                    --                                        new_gap +
-                    --                                     new_gap / 2;
-                    --                              else
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y - new_gap mod 2 -
-                    --                                     new_gap / 2;
-                    --                              end if;
-                    --                          elsif modulo_check = 1 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y -
-                    --                                     (midpoint - counter) * new_gap;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y +
-                    --                                     (counter - midpoint) * new_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      else
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (next_sib)
-                    --                          then
-                    --                              LOT (next_sib).y :=
-                    --                                 LOT (i).y + LOT (i).h + new_gap;
-                    --                          end if;
-                    --                      end if;
-                    --                  else
-                    --                      if LOT_Parent.child_flex.buoy = space_between
-                    --                      then
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (prev_sib)
-                    --                          then
-                    --                              curr_gap :=
-                    --                                 LOT (prev_sib).y - LOT (i).y -
-                    --                                 LOT (i).h;
-                    --                              if curr_gap < new_gap then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y - new_gap + curr_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      elsif LOT_Parent.child_flex.buoy =
-                    --                         space_around or
-                    --                         LOT_Parent.child_flex.buoy = space_evenly
-                    --                      then
-                    --                          if modulo_check = 0 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y +
-                    --                                     (midpoint - counter) * new_gap +
-                    --                                     new_gap mod 2 + new_gap / 2;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y -
-                    --                                     (counter - midpoint - 1) *
-                    --                                        new_gap -
-                    --                                     new_gap / 2;
-                    --                              else
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y + new_gap mod 2 +
-                    --                                     new_gap / 2;
-                    --                              end if;
-                    --                          elsif modulo_check = 1 then
-                    --                              if counter < midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y +
-                    --                                     (midpoint - counter) * new_gap;
-                    --                              elsif counter > midpoint then
-                    --                                  LOT (i).y :=
-                    --                                     LOT (i).y -
-                    --                                     (counter - midpoint) * new_gap;
-                    --                              end if;
-                    --                          end if;
-                    --                      else
-                    --                          if Layout_Object_Tree.Has_Element
-                    --                                (prev_sib)
-                    --                          then
-                    --                              LOT (i).y :=
-                    --                                 LOT (prev_sib).y - LOT (i).h -
-                    --                                 new_gap;
-                    --                          end if;
-                    --                      end if;
-                    --                  end if;
-                    --              end if;
-                    --          end if;
-                    --          counter := counter + 1;
-                    --      end loop;
-                    --  end calculate_gap;
-
                     procedure calculate_align is
                         next_x : Natural :=
                            LOT_Parent
@@ -1024,7 +784,7 @@ begin
     main_widget :=
        new Widget.Instance'
           (Controlled with id => +"main",
-           child_flex => (dir => top_bottom, gap_r => (pixel, 15), others => <>),bgd => HAL.Bitmap.Grey, others => <>);
+           child_flex => (dir => left_right, gap_r => (pixel, 5), others => <>),bgd => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);
     --font.font_1_img := g.Load_QOI ("data/font_1.qoi");
