@@ -65,27 +65,27 @@ package body Widget.Button is
             This.bgd := This.colors(clicking);
             --This.button_text.bgd := This.bgd;
             --Put_Line("I am a button widget.");
-        else
-            This.state := idle;
-            This.bgd := This.colors(idle);
+        --  else
+        --      This.state := idle;
+        --      This.bgd := This.colors(idle);
             --This.button_text.bgd := This.bgd;
         end if;
     end Click;
 
---     overriding
---     function Is_Clickable(This: in Instance) return Boolean is
---     begin
---     return True;
---     end Is_Clickable;
+   overriding
+   function Is_Clickable(This: in Instance) return Boolean is
+   begin
+   return True;
+   end Is_Clickable;
 
---     procedure release_click(This: in out Instance) is
---     begin
---          if This.state = clicking then
---              This.state := idle;
---              This.bgd := This.colors(idle);
---              --This.button_text.bgd := This.colors(idle);
---          end if;
---     end release_click;
+   procedure release_click(This: in out Instance) is
+   begin
+        if This.state = clicking then
+            This.state := idle;
+            This.bgd := This.colors(idle);
+            --This.button_text.bgd := This.colors(idle);
+        end if;
+   end release_click;
     
     overriding 
     procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class) is

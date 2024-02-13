@@ -16,7 +16,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --with namespaces; use namespaces;
 
 with Widget;
---with Widget.Button;
+with Widget.Button;
 
 package body dui is
 
@@ -172,15 +172,19 @@ package body dui is
         STM32.Board.Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Green);
 
         if State'Length = 0 then
-            null;
+            --null;
+            for C in LOT.Iterate loop
+                if Layout_Object_Tree.Element (c).Is_Clickable then
+                    Widget.Button.Any_Acc (Layout_Object_Tree.Element (c)).release_click;
+                end if;
+            end loop;
         elsif State'Length = 1 then
             Curr_X := State (State'First).X;
             Curr_Y := State (State'First).Y;
             --STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
             --(((Curr_X, Curr_Y), 40, 40), 20);
             for C in LOT.Iterate loop
-                if Layout_Object_Tree.Element (c).Is_In_Bound (Curr_X, Curr_Y)
-                then
+                if Layout_Object_Tree.Element (c).Is_In_Bound (Curr_X, Curr_Y) then
                     Layout_Object_Tree.Element (c).Click;
                 end if;
             end loop;

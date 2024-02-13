@@ -81,8 +81,8 @@ package body Widget is
         null;--Ada.Text_IO.Put_Line("I am a widget");
     end Click;
 
-    --     function Is_Clickable(This: in Instance) return Boolean is
-    --     begin
-    --     return False;
-    --     end Is_Clickable;
+    function Is_Clickable(This: in Instance) return Boolean is
+    begin
+    return False;
+    end Is_Clickable;
 end Widget;
