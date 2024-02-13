@@ -34,8 +34,8 @@ package Widget.Button is
    --  overriding
    --  procedure Event (This : in out Instance; Evt : Event_Kind);
 
-   --  overriding 
-   --  procedure Click (This: in out Instance);
+   overriding 
+   procedure Click (This: in out Instance);
 
    overriding
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);

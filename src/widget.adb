@@ -76,10 +76,10 @@ package body Widget is
         img.Fill_Rect (Area => (Position => (this.x, this.y), Width => this.w, Height => this.h));
     end Draw;
 
-        procedure Click (This : in out Instance) is
-        begin
-            null;--Ada.Text_IO.Put_Line("I am a widget");
-        end Click;
+    procedure Click (This : in out Instance) is
+    begin
+        null;--Ada.Text_IO.Put_Line("I am a widget");
+    end Click;
 
     --     function Is_Clickable(This: in Instance) return Boolean is
     --     begin

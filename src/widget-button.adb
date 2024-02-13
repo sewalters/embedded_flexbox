@@ -26,7 +26,12 @@ package body Widget.Button is
                               max_width     => max_width,
                               bgd           => bgd,
                               others        => <>);
-        --Any_Acc(this).colors(idle) := bgd;
+        if bgd = HAL.Bitmap.White then
+            Any_Acc(this).colors(idle) := bgd;
+            Any_Acc(this).colors(clicking) := HAL.Bitmap.Gray;
+        else
+            Any_Acc(this).colors(idle) := bgd;
+        end if;
         dui.add_to_LOT (This, Parent);
 --          if text /= "" then
 --          Any_Acc(this).button_text := Widget.Text.Create (id         => id & ".text",
@@ -52,20 +57,20 @@ package body Widget.Button is
 --          Put_Line("==================== --> Button Clicked!! <-- ======================");
 --      end Event;
 
-    overriding 
+    overriding
     procedure Click (This: in out Instance) is
     begin
         if This.state = idle then
-        This.state := clicking;
-        This.bgd := This.colors(clicking);
-        --This.button_text.bgd := This.bgd;
-        --Put_Line("I am a button widget.");
+            This.state := clicking;
+            This.bgd := This.colors(clicking);
+            --This.button_text.bgd := This.bgd;
+            --Put_Line("I am a button widget.");
         else
-        This.state := idle;
-        This.bgd := This.colors(idle);
-        --This.button_text.bgd := This.bgd;
+            This.state := idle;
+            This.bgd := This.colors(idle);
+            --This.button_text.bgd := This.bgd;
         end if;
-    end;
+    end Click;
 
 --     overriding
 --     function Is_Clickable(This: in Instance) return Boolean is

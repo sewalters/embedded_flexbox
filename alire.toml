@@ -13,3 +13,5 @@ gnat_arm_elf = { version='12.2.1' }
 [[depends-on]]
 stm32_gui = "~0.1.0-dev"
 stm32f746disco = "~0.1.0-dev"
+[build-switches]
+"*".style_checks = "No"

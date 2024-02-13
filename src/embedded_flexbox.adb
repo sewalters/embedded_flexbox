@@ -32,16 +32,16 @@ procedure Embedded_Flexbox is
      self_flex  =>
       (expand_w => (percent, 0.2), expand_h => (pixel, 30), others => <>),
      child_flex => (dir => left_right, others => <>), bgd => HAL.Bitmap.Green);
-text_example : Widget.Any_Acc :=
-   Widget.Text.Create
-    (id        => "Text", parent => header, text => "Example text",
-     self_flex =>
-      (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
-bt_example : Widget.Any_Acc :=
-   Widget.Button.Create
-    (id        => "BT", parent => header, text => "Button",
-     self_flex =>
-      (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Cyan);
+   --  text_example : Widget.Any_Acc :=
+   --     Widget.Text.Create
+   --     (id        => "Text", parent => header, text => "Example text",
+   --     self_flex =>
+   --        (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
+   bt_example : Widget.Any_Acc :=
+      Widget.Button.Create
+      (id        => "BT", parent => header, text => "Button",
+      self_flex =>
+         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Cyan);
 begin
   dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 end Embedded_Flexbox;
