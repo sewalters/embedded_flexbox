@@ -93,7 +93,7 @@ package Widget is
    procedure Set_Height(This: in out Instance; calculated_height: Natural);
    --procedure Event (This : in out Instance; Evt : Event_Kind);
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
-   --procedure Click (This : in out Instance);
+   procedure Click (This : in out Instance);
    --function Is_Clickable(This: in Instance) return Boolean;
 
 private

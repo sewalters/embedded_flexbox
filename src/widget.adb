@@ -24,12 +24,12 @@ package body Widget is
         return This;
     end Create;
 
-    --  function Is_In_Bound (This : in out Instance; x_Input : Natural; y_Input : Natural) return Boolean is
-    --      returnval : Boolean;
-    --  begin
-    --      returnval := ((This.x <= x_Input) and ((This.x + This.w) >= x_Input)) and ((This.y <= y_Input) and ((This.y + This.h) >= y_Input));
-    --      return returnval;
-    --  end;
+    function Is_In_Bound (This : in out Instance; x_Input : Natural; y_Input : Natural) return Boolean is
+        returnval : Boolean;
+    begin
+        returnval := ((This.x <= x_Input) and ((This.x + This.w) >= x_Input)) and ((This.y <= y_Input) and ((This.y + This.h) >= y_Input));
+        return returnval;
+    end;
 
     procedure Set_Width (This : in out Instance; calculated_width : Natural) is
     begin
@@ -76,10 +76,10 @@ package body Widget is
         img.Fill_Rect (Area => (Position => (this.x, this.y), Width => this.w, Height => this.h));
     end Draw;
 
-    --      procedure Click (This : in out Instance) is
-    --      begin
-    --          null;--Ada.Text_IO.Put_Line("I am a widget");
-    --      end Click;
+        procedure Click (This : in out Instance) is
+        begin
+            null;--Ada.Text_IO.Put_Line("I am a widget");
+        end Click;
 
     --     function Is_Clickable(This: in Instance) return Boolean is
     --     begin
