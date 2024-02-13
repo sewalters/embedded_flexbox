@@ -735,6 +735,18 @@ package body dui is
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
             Layout_Object_Tree.Iterate (LOT, compute_node'Access);
             --Layout_Object_Tree.Iterate (LOT, render_node'Access);
+
+            --  for C in LOT.Iterate loop
+            --  declare
+            --   widg : Widget.Any_Acc := Layout_Object_Tree.Element(c);
+            --  begin
+            --      widg.x := 0;
+            --      widg.y := 0;
+            --      widg.w := 100;
+            --      widg.h := 100;
+            --  end;
+            --  end loop;
+
             render_node;
 
             -- Move Buffered layer to visible layer.
@@ -784,7 +796,7 @@ begin
     main_widget :=
        new Widget.Instance'
           (Controlled with id => +"main",
-           child_flex => (dir => left_right, gap_r => (pixel, 5), others => <>),bgd => HAL.Bitmap.Grey, others => <>);
+           child_flex => (dir => top_bottom, others => <>),bgd => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);
     --font.font_1_img := g.Load_QOI ("data/font_1.qoi");
