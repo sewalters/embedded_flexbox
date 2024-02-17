@@ -736,6 +736,7 @@ package body dui is
             Layout_Object_Tree.Iterate (LOT, compute_node'Access);
             --Layout_Object_Tree.Iterate (LOT, render_node'Access);
 
+            
             --  for C in LOT.Iterate loop
             --  declare
             --   widg : Widget.Any_Acc := Layout_Object_Tree.Element(c);
@@ -795,7 +796,7 @@ begin
 
     main_widget :=
        new Widget.Instance'
-          (Controlled with id => +"main",
+          (Controlled with id => +"main", 
            child_flex => (dir => top_bottom, others => <>),bgd => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);

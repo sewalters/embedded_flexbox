@@ -12,7 +12,7 @@ package Widget.Image is
 
     type Instance is new Parent with 
     record
-        image        : Texture;
+        image        : Ada.Strings.Unbounded.Unbounded_String;
     end record;
 
     subtype Class is Instance'Class;
@@ -22,7 +22,7 @@ package Widget.Image is
 
     function Create (id            : string;
                      parent        : Widget.Any_Acc;
-                     image  : Texture;
+                     image  : string;
                      self_flex     : flex_t  := default_flex;
                      child_flex    : flex_t  := default_flex;
                      min_height, min_width : Natural := 0;
