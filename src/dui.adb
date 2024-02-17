@@ -3,6 +3,10 @@ with Ada.Real_Time;    use Ada.Real_Time;
 with Ada.Text_IO;      use Ada.Text_IO;
 with STM32.Board;      use STM32.Board;
 with HAL.Bitmap;       use HAL.Bitmap;
+with HAL.Touch_Panel;       use HAL.Touch_Panel;
+with BMP_Fonts;
+with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
+with HAL.Framebuffer;
 
 --with font;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -12,7 +16,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --with namespaces; use namespaces;
 
 with Widget;
---with Widget.Button;
+with Widget.Button;
 
 package body dui is
 
@@ -138,6 +142,8 @@ package body dui is
         --      end debug_dui;
 
         procedure render_node is
+    Curr_X : Natural := 0;
+    Curr_Y : Natural := 0;
         begin
 
             for C in LOT.Iterate loop
@@ -159,6 +165,37 @@ package body dui is
                     --          Height   => w.h));
                 end;
             end loop;
+      declare
+          State : constant TP_State := STM32.Board.Touch_Panel.Get_All_Touch_Points;
+      begin
+
+        STM32.Board.Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Green);
+
+        if State'Length = 0 then
+            --null;
+            for C in LOT.Iterate loop
+                if Layout_Object_Tree.Element (c).Is_Clickable then
+                    Widget.Button.Any_Acc (Layout_Object_Tree.Element (c)).release_click;
+                end if;
+            end loop;
+        elsif State'Length = 1 then
+            Curr_X := State (State'First).X;
+            Curr_Y := State (State'First).Y;
+            --STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
+            --(((Curr_X, Curr_Y), 40, 40), 20);
+            for C in LOT.Iterate loop
+                if Layout_Object_Tree.Element (c).Is_In_Bound (Curr_X, Curr_Y) then
+                    Layout_Object_Tree.Element (c).Click;
+                end if;
+            end loop;
+        else
+            null;
+        end if;
+
+        if State'Length > 0 then
+            STM32.Board.Display.Update_Layer (1, Copy_Back => True);
+        end if;
+      end;
             STM32.Board.Display.Update_Layer (1);
         end render_node;
 
@@ -729,7 +766,7 @@ package body dui is
         --      Elapsed_Time : Time_Span;
 
     begin
-        for i in 1 .. 300 loop
+        loop
             --      Start_Time                                        := Clock;
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
@@ -793,6 +830,7 @@ begin
     -- initialize STM32 Board Display
     STM32.Board.Display.Initialize;
     STM32.Board.Display.Initialize_Layer (1, HAL.Bitmap.ARGB_1555);
+    STM32.Board.Touch_Panel.Initialize;
 
     main_widget :=
        new Widget.Instance'

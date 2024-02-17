@@ -88,13 +88,13 @@ package Widget is
    -- procedure initialize (This : in out Instance);
    -- procedure adjust (This : in out Instance);
    -- procedure finalize (This : in out Instance);
-   --function Is_In_Bound (This : in out Instance; x_Input: Natural; y_Input : Natural) return Boolean;
+   function Is_In_Bound (This : in out Instance; x_Input: Natural; y_Input : Natural) return Boolean;
    procedure Set_Width(This: in out Instance; calculated_width: Natural);
    procedure Set_Height(This: in out Instance; calculated_height: Natural);
    --procedure Event (This : in out Instance; Evt : Event_Kind);
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
-   --procedure Click (This : in out Instance);
-   --function Is_Clickable(This: in Instance) return Boolean;
+   procedure Click (This : in out Instance);
+   function Is_Clickable(This: in Instance) return Boolean;
 
 private
 
