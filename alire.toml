@@ -8,6 +8,9 @@ maintainers-logins = ["github-username"]
 
 executables = ["embedded_flexbox"]
 
+[build-switches]
+"*".style_checks = "No"
+
 [[pins]]
 gnat_arm_elf = { version='12.2.1' }
 [[depends-on]]
