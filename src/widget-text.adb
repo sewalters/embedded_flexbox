@@ -12,8 +12,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  Bitmapped_Drawing.Draw_String
 --    (Buffer     => STM32.Board.Display.Hidden_Buffer (1).all,
 --     Start      => Scale ((0, 0)), Msg => "Hello, World!",
---     Font       => Current_Font, Foreground => Foreground,
---     Background => Background);
+--     Font       => Current_Font, Foreground => fgd,
+--     Background => bgd);
 
 package body Widget.Text is
 
@@ -23,8 +23,8 @@ package body Widget.Text is
         child_flex            : flex_t       := default_flex;
         min_height, min_width : Natural      := 0;
         max_height, max_width : Natural      := Natural'Last;
-        foreground            : Bitmap_Color := HAL.Bitmap.White;
-        background : Bitmap_Color := Hal.Bitmap.Black) return Widget.Any_Acc
+        fgd            : Bitmap_Color := HAL.Bitmap.White;
+        bgd : Bitmap_Color := Hal.Bitmap.Black) return Widget.Any_Acc
     is
         This : Widget.Any_Acc;
     begin
@@ -34,8 +34,11 @@ package body Widget.Text is
                self_flex             => self_flex, child_flex => child_flex,
                min_height            => min_height, min_width => min_width,
                max_height => max_height, max_width => max_width, font => font,
-               foreground            => foreground, background => Parent.bgd,
+               fgd            => fgd, bgd => Parent.bgd,
                others                => <>);
+        if Parent.bgd = HAL.Bitmap.White then
+            Any_Acc(this).fgd := HAL.Bitmap.Gray;
+        end if;
         dui.add_to_LOT (This, parent);
         return This;
     end Create;
@@ -58,8 +61,8 @@ package body Widget.Text is
     begin
         Bitmapped_Drawing.Draw_String
            (Buffer => img, Start => pnt, Msg => str,
-            Font       => this.font, Foreground => this.foreground,
-            Background => this.background);
+            Font       => this.font, Foreground => this.fgd,
+            Background => this.bgd);
     end Draw;
 
 end Widget.Text;
