@@ -33,21 +33,13 @@ package body Widget.Button is
             Any_Acc(this).colors(idle) := bgd;
         end if;
         dui.add_to_LOT (This, Parent);
---          if text /= "" then
---          Any_Acc(this).button_text := Widget.Text.Create (id         => id & ".text",
---                                                  parent     => this,
---                                                  text       => text,
---                                                  self_flex  => (expand_w => (behavior => max),
---                                                                 expand_h => (behavior => max),
---                                                                 others   => <>),
---                                                  child_flex => (dir    => left_right,
---                                                                 others => <>),
---                                                  min_height => min_height, 
---                                                  min_width => min_width, 
---                                                  max_height => max_height, 
---                                                  max_width => max_width,
---                                                  bgd        => bgd);--this variable affects the color of the button
---          end if;
+          if text /= "" then
+            Any_Acc(this).button_text := 
+                Widget.Text.Create
+                (id        => id & ".text", parent => this, text => text,
+                self_flex =>
+                    (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
+          end if;
         return This;
     end;
 
@@ -63,12 +55,8 @@ package body Widget.Button is
         if This.state = idle then
             This.state := clicking;
             This.bgd := This.colors(clicking);
-            --This.button_text.bgd := This.bgd;
+            This.button_text.bgd := This.colors(clicking);
             --Put_Line("I am a button widget.");
-        --  else
-        --      This.state := idle;
-        --      This.bgd := This.colors(idle);
-            --This.button_text.bgd := This.bgd;
         end if;
     end Click;
 
@@ -83,7 +71,7 @@ package body Widget.Button is
         if This.state = clicking then
             This.state := idle;
             This.bgd := This.colors(idle);
-            --This.button_text.bgd := This.colors(idle);
+            This.button_text.bgd := This.colors(idle);
         end if;
    end release_click;
     

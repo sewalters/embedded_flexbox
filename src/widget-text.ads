@@ -9,8 +9,8 @@ package Widget.Text is
    with record
       text          : Ada.Strings.Unbounded.Unbounded_String;
       font : BMP_Font;
-      foreground    : Bitmap_Color := Hal.Bitmap.White;
-      background : Bitmap_Color := Hal.Bitmap.Black;
+      fgd    : Bitmap_Color := Hal.Bitmap.White;
+      --bgd : Bitmap_Color := Hal.Bitmap.Black;
       magnification : natural := 2;
    end record;
    
@@ -27,8 +27,8 @@ package Widget.Text is
                     child_flex    : flex_t  := default_flex;
                     min_height, min_width : Natural := 0;
                     max_height, max_width : Natural := Natural'Last;
-                    foreground           : Bitmap_Color:= Hal.Bitmap.White;
-                    background : Bitmap_Color:= Hal.Bitmap.Black) return Widget.Any_Acc;
+                    fgd           : Bitmap_Color:= Hal.Bitmap.White;
+                    bgd : Bitmap_Color:= Hal.Bitmap.Black) return Widget.Any_Acc;
 
    --  overriding
    --  procedure Event (This : in out Instance; Evt : Event_Kind);
