@@ -37,6 +37,9 @@ procedure Embedded_Flexbox is
      self_flex  =>
       (expand_w => (percent, 0.33), expand_h => (behavior => max), others => <>),
      child_flex => (dir => top_bottom, buoy => space_around, align => stretch,  others => <>), bgd => HAL.Bitmap.Green);
+
+     
+
   header_widget    : Widget.Any_Acc :=
    Widget.Create
     (id         => "header", parent => header,
@@ -119,9 +122,9 @@ procedure Embedded_Flexbox is
    Widget.Create
     (id         => "header", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>),
+      (expand_w => (pixel, 30), expand_h => (pixel, 30), others => <>),
      child_flex => (dir => left_right,  others => <>),
-     bgd        => HAL.Bitmap.Blue);
+     bgd        => HAL.Bitmap.Brown);
 --     text_left_parent : Widget.Any_Acc :=
 --        Widget.Text.Create
 --        (id        => "Text", parent => header, text => "Frame 1",
@@ -137,7 +140,7 @@ procedure Embedded_Flexbox is
          
    bt_example : Widget.Any_Acc :=
       Widget.Button.Create
-      (id        => "BT", parent => header, text => "Button",
+      (id        => "BT", parent => header, text => "BT",
       self_flex =>
          (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>), bgd => HAL.Bitmap.Cyan);
 begin
