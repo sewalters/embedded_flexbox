@@ -46,7 +46,7 @@ procedure Embedded_Flexbox is
       Widget.Button.Create
       (id        => "BT", parent => header, text => "Button",
       self_flex =>
-         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Cyan);
+         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Purple);
 begin
   --  stm32.Board.Display.Hidden_Buffer(1).Set_Source(HAL.Bitmap.Red);
   --  stm32.Board.Display.Hidden_Buffer(1).Fill_Rect(Area => ( Position => (0, 0), Width => 10, Height => 10));
