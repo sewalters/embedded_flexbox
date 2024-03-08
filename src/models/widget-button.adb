@@ -26,20 +26,23 @@ package body Widget.Button is
                               max_width     => max_width,
                               bgd           => bgd,
                               others        => <>);
+        
         if bgd = HAL.Bitmap.White then
             Any_Acc(this).colors(idle) := bgd;
             Any_Acc(this).colors(clicking) := HAL.Bitmap.Gray;
         else
             Any_Acc(this).colors(idle) := bgd;
         end if;
+        
         dui.add_to_LOT (This, Parent);
-          if text /= "" then
-            Any_Acc(this).button_text := 
-                Widget.Text.Create
-                (id        => id & ".text", parent => this, text => text,
-                self_flex =>
-                    (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
-          end if;
+        
+        if text /= "" then
+        Any_Acc(this).button_text := 
+            Widget.Text.Create
+            (id        => id & ".text", parent => this, text => text,
+            self_flex =>
+                (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
+        end if;
         return This;
     end;
 
@@ -48,6 +51,14 @@ package body Widget.Button is
 --      begin
 --          Put_Line("==================== --> Button Clicked!! <-- ======================");
 --      end Event;
+
+    overriding 
+    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class) is
+        use STM32.Board;
+    begin
+        img.Set_Source (this.bgd);
+        img.Fill_Rect (Area => (Position => (this.x, this.y), Width => this.w, Height => this.h));
+    end Draw;
 
     overriding
     procedure Click (This: in out Instance) is
@@ -60,27 +71,19 @@ package body Widget.Button is
         end if;
     end Click;
 
-   overriding
-   function Is_Clickable(This: in Instance) return Boolean is
-   begin
-   return True;
-   end Is_Clickable;
+    overriding
+    function Is_Clickable(This: in Instance) return Boolean is
+    begin
+    return True;
+    end Is_Clickable;
 
-   procedure release_click(This: in out Instance) is
-   begin
+    procedure release_click(This: in out Instance) is
+    begin
         if This.state = clicking then
             This.state := idle;
             This.bgd := This.colors(idle);
             This.button_text.bgd := This.colors(idle);
         end if;
-   end release_click;
-    
-    overriding 
-    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class) is
-        use STM32.Board;
-    begin
-        img.Set_Source (this.bgd);
-        img.Fill_Rect (Area => (Position => (this.x, this.y), Width => this.w, Height => this.h));
-    end Draw;
+    end release_click;
 
 end Widget.Button;

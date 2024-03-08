@@ -7,6 +7,11 @@ with HAL.Touch_Panel;         use HAL.Touch_Panel;
 with BMP_Fonts;
 with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 with HAL.Framebuffer;
+with Bitmapped_Drawing; use Bitmapped_Drawing;
+with Ada.Numerics; use Ada.Numerics;
+
+with Ada.Numerics.Elementary_Functions;
+use  Ada.Numerics.Elementary_Functions;
 
 --with font;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -17,6 +22,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Widget;
 with Widget.Button;
+with Widget.Observer;
 
 package body dui is
 
@@ -144,11 +150,13 @@ package body dui is
         procedure render_node is
             Curr_X : Natural := 0;
             Curr_Y : Natural := 0;
+            Curr_W : Natural := 0;
+            --Curr_Observer : Widget.Observer.Any_Acc := Widget.Observer.Create("curr_observer");
         begin
 
             for C in LOT.Iterate loop
-                --declare
-                --w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
+                declare
+                w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
                 begin
                     --480x272
                     --  if w.x < 0 or w.x > (480 - w.w) then
@@ -159,6 +167,9 @@ package body dui is
                     --  end if;
                     Layout_Object_Tree.Element (c).Draw
                        (img => STM32.Board.Display.Hidden_Buffer (1).all);
+                    if Layout_Object_Tree.Element (C).Is_Clickable then
+                        Widget.Observer.add_Widget(w);
+                    end if;
                     --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (w.bgd);
                     --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
                     --     (Area =>
@@ -186,6 +197,14 @@ package body dui is
                 elsif State'Length = 1 then
                     Curr_X := State (State'First).X;
                     Curr_Y := State (State'First).Y;
+                    Curr_W := State (State'First).Weight;
+                    --  Bitmapped_Drawing.Draw_String
+                    --      (Display.Hidden_Buffer (1).all, 
+                    --      Start => (0, 0),
+                    --      Msg => "X: " & Curr_X'Image & " Y: " & Curr_Y'Image & " Weight: " & Curr_W'Image, 
+                    --      Font => BMP_Fonts.Font8x8,
+                    --      Foreground => HAL.Bitmap.White,
+                    --      Background => HAL.Bitmap.Black);
                     --STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
                     --(((Curr_X, Curr_Y), 40, 40), 20);
                     for C in LOT.Iterate loop
@@ -195,6 +214,25 @@ package body dui is
                             Layout_Object_Tree.Element (C).Click;
                         end if;
                     end loop;
+                elsif State'Length = 2 then
+                    --  declare
+                    --      x1, x2, y1, y2, tx, ty, dt : Natural := 0;
+                    --      ft : Float := 0.0;
+                    --  begin
+                    --      x1 := State (1).X;
+                    --      y1 := State (1).Y;
+                    --      x2 := State (2).X;
+                    --      y2 := State (2).Y;
+                    --      tx := x2 - x1;
+                    --      ty := y2 - y1;
+                    --      tx := tx ** 2;
+                    --      ty := ty ** 2;
+                    --      ft := Float(tx) + Float(ty);
+                    --      dt := Natural(Sqrt (ft));
+                    --      STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
+                    --      (((x1, y1), dt, dt), dt / 2);
+                    --  end;
+                    null;
                 else
                     null;
                 end if;
