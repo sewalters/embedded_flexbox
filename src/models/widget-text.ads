@@ -29,6 +29,7 @@ package Widget.Text is
                     min_height, min_width : Natural := 0;
                     max_height, max_width : Natural := Natural'Last;
                     overflow : text_overflow := default;
+                    text_spacing : gap_t := (pixel, 8);
                     fgd           : Bitmap_Color:= Hal.Bitmap.White;
                     bgd : Bitmap_Color:= Hal.Bitmap.Black) return Widget.Any_Acc;
 

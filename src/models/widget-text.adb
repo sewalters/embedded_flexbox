@@ -12,6 +12,7 @@ package body Widget.Text is
         min_height, min_width : Natural       := 0;
         max_height, max_width : Natural       := Natural'Last;
         overflow              : text_overflow := default;
+        text_spacing : gap_t := (pixel, 8);
         fgd                   : Bitmap_Color  := HAL.Bitmap.White;
         bgd : Bitmap_Color  := HAL.Bitmap.Black) return Widget.Any_Acc
     is
@@ -28,6 +29,9 @@ package body Widget.Text is
         if parent.bgd = HAL.Bitmap.White then
             Any_Acc (This).fgd := HAL.Bitmap.Gray;
         end if;
+
+        This.self_flex.gap_r := text_spacing; -- Set spacing between lines.
+
         dui.add_to_LOT (This, parent);
         return This;
     end Create;
@@ -52,6 +56,7 @@ package body Widget.Text is
         Word_Size    : Natural;
         x_font_size  : Natural;
         y_font_size  : Natural;
+        line_spacing : Natural;
 
         function Parse_Word
            (Input_String : in Unbounded_String; Start_Index : in Natural)
@@ -73,6 +78,15 @@ package body Widget.Text is
         end Parse_Word;
 
     begin
+        case This.self_flex.gap_r.behavior is
+            when pixel =>
+                line_spacing := This.self_flex.gap_r.pixel;
+            when percent =>
+                line_spacing := Natural(Float(This.self_flex.gap_r.percent) * Float(This.h));
+            when others =>
+                line_spacing := 8; --8 pixels will be default spacing unless provided otherwise.
+        end case;
+
         case This.font is
             when Font8x8 =>
                 x_font_size := 8;
@@ -121,7 +135,53 @@ package body Widget.Text is
                     -- Get Size of Word
                     Word_Size := Length (Word) * x_font_size;
 
-                    if (pnt.X + Word_Size) <= (This.x + This.w) then
+                    if Word_Size > (This.x + This.w) then
+                        declare
+                            c : Character;
+                            div : Character := '-';
+                        begin
+                          for J in 1 .. Length(Word) loop
+                            c := Element(Word, J);
+
+                            if (pnt.x + x_font_size) <= (This.x + This.w - x_font_size) then
+                                Bitmapped_Drawing.Draw_Char
+                                  (Buffer => img,
+                                   Start => pnt,
+                                   Char => c,
+                                   Font => This.font,
+                                   Foreground => Bitmap_Color_To_Word(ARGB_1555, This.fgd),
+                                   Background => Bitmap_Color_To_Word(ARGB_1555, This.bgd));
+                                
+                                pnt.x := pnt.x + x_font_size;
+
+                            else
+                              Bitmapped_Drawing.Draw_Char
+                                  (Buffer => img,
+                                   Start => pnt,
+                                   Char => div,
+                                   Font => This.font,
+                                   Foreground => Bitmap_Color_To_Word(ARGB_1555, This.fgd),
+                                   Background => Bitmap_Color_To_Word(ARGB_1555, This.bgd));
+
+                              pnt.x := This.x;
+                              pnt.y := pnt.y + y_font_size + line_spacing;
+
+                              Bitmapped_Drawing.Draw_Char
+                                  (Buffer => img,
+                                   Start => pnt,
+                                   Char => c,
+                                   Font => This.font,
+                                   Foreground => Bitmap_Color_To_Word(ARGB_1555, This.fgd),
+                                   Background => Bitmap_Color_To_Word(ARGB_1555, This.bgd));
+                                
+                                pnt.x := pnt.x + x_font_size;
+                              
+                            end if;
+
+                          end loop;
+                        end;
+
+                    elsif (pnt.X + Word_Size) <= (This.x + This.w) then
                         -- Print the word
                         Bitmapped_Drawing.Draw_String
                            (Buffer     => img, Start => pnt,
@@ -132,9 +192,9 @@ package body Widget.Text is
                         pnt.X := pnt.X + (Length (Word) * x_font_size) + x_font_size;
 
                     else
-                        if (pnt.Y + y_font_size + 8) <= (This.y + This.h) then
+                        if (pnt.Y + y_font_size + line_spacing) <= (This.y + This.h) then
                             pnt.X := This.x;
-                            pnt.Y := pnt.Y + y_font_size + 8;
+                            pnt.Y := pnt.Y + y_font_size + line_spacing;
                             -- Print the word
                             Bitmapped_Drawing.Draw_String
                                (Buffer     => img, Start => pnt,
