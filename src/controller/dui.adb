@@ -291,7 +291,7 @@ package body dui is
                                 end if;
                             when content =>
                                 content_width := gap_c * (cc - 1);
-                                for j in Layout_Object_Tree.Iterate_Subtree() loop
+                                for j in Layout_Object_Tree.Iterate_Children(LOT, c) loop
                                     content_width := content_width + LOT(j).w;
                                 end loop;
                                 if content_width > width_pixel_left then
