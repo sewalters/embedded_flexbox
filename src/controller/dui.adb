@@ -238,6 +238,7 @@ package body dui is
             height_pixel_left  : Natural      := LOT_Parent.h;
             total_portion      : Natural      := 0;
             nmbr_max           : Natural      := 0;
+            content_width, content_height : Natural := 0;
 
             procedure calculate_portions is
             begin
@@ -289,7 +290,15 @@ package body dui is
                                     width_pixel_left := 0;
                                 end if;
                             when content =>
-                                null;
+                                content_width := gap_c * (cc - 1);
+                                for j in Layout_Object_Tree.Iterate_Subtree() loop
+                                    content_width := content_width + LOT(j).w;
+                                end loop;
+                                if content_width > width_pixel_left then
+                                    width_pixel_left := 0;
+                                else
+                                    width_pixel_left := width_pixel_left - content_width;
+                                end if;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -321,7 +330,12 @@ package body dui is
                                     height_pixel_left := 0;
                                 end if;
                             when content =>
-                                null;
+                                if expand_h.pixel <= height_pixel_left then
+                                    height_pixel_left :=
+                                       height_pixel_left - expand_h.pixel;
+                                else
+                                    height_pixel_left := 0;
+                                end if;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -529,6 +543,7 @@ package body dui is
                 space_evenly_y  : Natural := 0;
             begin
                 buoy_wh := LOT_Parent.child_flex.buoy;
+
                 case buoy_wh is
                     when space_between =>
                         for i in Layout_Object_Tree.Iterate_Children (LOT, c)
@@ -684,7 +699,7 @@ package body dui is
                             end if;
                         end loop;
                     when space_nothing =>
-                        null;
+                        null; 
                     when others =>
                         null;
                 end case;
@@ -698,6 +713,83 @@ package body dui is
                    LOT_Parent
                       .y; -- variable to calculate the next y-coord of siblings when calculating left alignment
             begin
+                for i in Layout_Object_Tree.Iterate_Children(LOT, c) loop
+                    if LOT(i).self_flex.align = stretch or LOT(i).self_flex.align = center or LOT(i).self_flex.align = bottom or LOT(i).self_flex.align = left
+                    or LOT(i).self_flex.align = right then
+                        case LOT(i).self_flex.align is
+                            when stretch =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).h := LOT_ph;
+
+                                    when bottom_top | top_bottom =>
+                                        LOT (i).w := LOT_pw;
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when center =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).y := (LOT_ph - LOT (i).h) / 2;
+
+                                    when bottom_top | top_bottom =>
+                                        LOT (i).x :=
+                                        (LOT_pw / 2) - (LOT (i).w / 2);
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when bottom =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
+
+                                    when bottom_top | top_bottom =>
+                                        next_y    := next_y - LOT (i).h;
+                                        LOT (i).y := next_y;
+
+                                    when others =>
+                                        null;
+                            end case;
+                            when left =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).x := next_x;
+                                        next_x    := next_x + LOT (i).w;
+
+                                    when top_bottom | bottom_top =>
+                                        LOT (i).x := LOT_Parent.x;
+                                        LOT (i).y := next_y;
+                                        next_y    := next_y + LOT (i).h;
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when right =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        next_x := next_x - LOT (i).w;
+
+                                    if next_x >= LOT_Parent.x then
+                                        LOT (i).x := next_x;
+
+                                    end if;
+
+                                    when top_bottom | bottom_top =>
+                                        LOT (i).x :=
+                                       LOT_Parent.x + LOT_Parent.w - LOT (i).w;
+                                        LOT (i).y := next_y;
+                                        next_y    := next_y + LOT (i).h;
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when others =>
+                                null; -- No action for unspecified alignments
+                        end case;
+                    end if;
+                end loop;
                 align_wh := LOT_Parent.child_flex.align;
                 case align_wh is
                     when stretch =>
