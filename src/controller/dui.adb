@@ -22,7 +22,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Widget;
 with Widget.Button;
-with Widget.Observer;
+with Widget_Observer;
 
 package body dui is
 
@@ -148,12 +148,7 @@ package body dui is
         --      end debug_dui;
 
         procedure render_node is
-            Curr_X : Natural := 0;
-            Curr_Y : Natural := 0;
-            Curr_W : Natural := 0;
-            --Curr_Observer : Widget.Observer.Any_Acc := Widget.Observer.Create("curr_observer");
         begin
-
             for C in LOT.Iterate loop
                 declare
                 w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
@@ -167,9 +162,6 @@ package body dui is
                     --  end if;
                     Layout_Object_Tree.Element (c).Draw
                        (img => STM32.Board.Display.Hidden_Buffer (1).all);
-                    if Layout_Object_Tree.Element (C).Is_Clickable then
-                        Widget.Observer.add_Widget(w);
-                    end if;
                     --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (w.bgd);
                     --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
                     --     (Area =>
@@ -177,70 +169,6 @@ package body dui is
                     --          Height   => w.h));
                 end;
             end loop;
-            declare
-                State : constant TP_State :=
-                   STM32.Board.Touch_Panel.Get_All_Touch_Points;
-            begin
-
-                STM32.Board.Display.Hidden_Buffer (1).Set_Source
-                   (HAL.Bitmap.Green);
-
-                if State'Length = 0 then
-                    --null;
-                    for C in LOT.Iterate loop
-                        if Layout_Object_Tree.Element (C).Is_Clickable then
-                            Widget.Button.Any_Acc
-                               (Layout_Object_Tree.Element (c))
-                               .release_click;
-                        end if;
-                    end loop;
-                elsif State'Length = 1 then
-                    Curr_X := State (State'First).X;
-                    Curr_Y := State (State'First).Y;
-                    Curr_W := State (State'First).Weight;
-                    --  Bitmapped_Drawing.Draw_String
-                    --      (Display.Hidden_Buffer (1).all, 
-                    --      Start => (0, 0),
-                    --      Msg => "X: " & Curr_X'Image & " Y: " & Curr_Y'Image & " Weight: " & Curr_W'Image, 
-                    --      Font => BMP_Fonts.Font8x8,
-                    --      Foreground => HAL.Bitmap.White,
-                    --      Background => HAL.Bitmap.Black);
-                    --STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
-                    --(((Curr_X, Curr_Y), 40, 40), 20);
-                    for C in LOT.Iterate loop
-                        if Layout_Object_Tree.Element (C).Is_In_Bound
-                              (Curr_X, Curr_Y)
-                        then
-                            Layout_Object_Tree.Element (C).Click;
-                        end if;
-                    end loop;
-                elsif State'Length = 2 then
-                    --  declare
-                    --      x1, x2, y1, y2, tx, ty, dt : Natural := 0;
-                    --      ft : Float := 0.0;
-                    --  begin
-                    --      x1 := State (1).X;
-                    --      y1 := State (1).Y;
-                    --      x2 := State (2).X;
-                    --      y2 := State (2).Y;
-                    --      tx := x2 - x1;
-                    --      ty := y2 - y1;
-                    --      tx := tx ** 2;
-                    --      ty := ty ** 2;
-                    --      ft := Float(tx) + Float(ty);
-                    --      dt := Natural(Sqrt (ft));
-                    --      STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
-                    --      (((x1, y1), dt, dt), dt / 2);
-                    --  end;
-                    null;
-                else
-                    null;
-                end if;
-
-                if State'Length > 0 then
-                    STM32.Board.Display.Update_Layer (1, Copy_Back => True);
-                end if;
-            end;
             STM32.Board.Display.Update_Layer (1);
         end render_node;
 
@@ -846,14 +774,86 @@ package body dui is
             end if;
         end compute_node;
 
+        procedure poll_events is
+            State : constant TP_State := STM32.Board.Touch_Panel.Get_All_Touch_Points;
+            Curr_X : Natural := 0;
+            Curr_Y : Natural := 0;
+            Curr_W : Natural := 0;
+        begin
+            STM32.Board.Display.Hidden_Buffer (1).Set_Source
+                (HAL.Bitmap.Green);
+
+            if State'Length = 0 and event_state = idle then
+                null;
+            elsif State'Length = 1 and event_state = idle then
+                null; -- button press here
+                -- call observer button press event procedure
+                Curr_X := State (State'First).X;
+                Curr_Y := State (State'First).Y;
+                Curr_W := State (State'First).Weight;
+                for C in LOT.Iterate loop
+                    if Layout_Object_Tree.Element (C).Is_In_Bound
+                            (Curr_X, Curr_Y)
+                    then
+                        Layout_Object_Tree.Element (C).Click;
+                    end if;
+                end loop;
+                event_state := press;
+            elsif State'Length = 1 and event_state = press then
+                null; -- idling in press (same press but waiting)
+            elsif State'Length = 0 and event_state = press then
+                 null; -- press has been released; transition back to idle
+                -- call observer button release procedure
+                for C in LOT.Iterate loop
+                    if Layout_Object_Tree.Element (C).Is_Clickable then
+                        Widget.Button.Any_Acc
+                            (Layout_Object_Tree.Element (c))
+                            .release_click;
+                    end if;
+                end loop;
+                event_state := idle;
+            elsif State'Length = 2 then
+                --  declare
+                --      x1, x2, y1, y2, tx, ty, dt : Natural := 0;
+                --      ft : Float := 0.0;
+                --  begin
+                --      x1 := State (1).X;
+                --      y1 := State (1).Y;
+                --      x2 := State (2).X;
+                --      y2 := State (2).Y;
+                --      tx := x2 - x1;
+                --      ty := y2 - y1;
+                --      tx := tx ** 2;
+                --      ty := ty ** 2;
+                --      ft := Float(tx) + Float(ty);
+                --      dt := Natural(Sqrt (ft));
+                --      STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
+                --      (((x1, y1), dt, dt), dt / 2);
+                --  end;
+                null;
+            else
+                null;
+            end if;
+
+            --  if State'Length > 0 then
+            --      STM32.Board.Display.Update_Layer (1, Copy_Back => True);
+            --  end if;
+            
+        end poll_events;
+
         --      Start_Time   : Time;
         --      Elapsed_Time : Time_Span;
 
     begin
-        loop
-            --      Start_Time                                        := Clock;
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
+            Layout_Object_Tree.Iterate (LOT, compute_node'Access);
+            render_node;
+        loop
+            poll_events;
+            --      Start_Time                                        := Clock;
+            --LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
+            --LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
             Layout_Object_Tree.Iterate (LOT, compute_node'Access);
             --Layout_Object_Tree.Iterate (LOT, render_node'Access);
 
