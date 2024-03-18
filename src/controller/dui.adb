@@ -214,13 +214,12 @@ package body dui is
         --      end test;
 
         procedure compute_node (c : Layout_Object_Tree.Cursor) is
-            cc : Natural      := Natural (Layout_Object_Tree.Child_Count (c));
-            LOT_Parent         : Widget.Class :=
-               Layout_Object_Tree.Element (c).all; --parent
+            cc                 : Natural      := Natural (Layout_Object_Tree.Child_Count (c));
+            LOT_Parent         : Widget.Class := Layout_Object_Tree.Element (c).all; --parent
             LOT_pw             : Natural      := LOT_Parent.w; --parent width
             LOT_ph             : Natural      := LOT_Parent.h; --parent height
-            LOT_ox : Natural      := LOT_Parent.x; --x offset for calculations
-            LOT_oy : Natural      := LOT_Parent.y; --y offset for calculations
+            LOT_ox             : Natural      := LOT_Parent.x; --x offset for calculations
+            LOT_oy             : Natural      := LOT_Parent.y; --y offset for calculations
             child_row          : Boolean      :=
                (LOT_Parent.child_flex.dir = left_right or
                 LOT_Parent.child_flex.dir = right_left);
@@ -234,10 +233,13 @@ package body dui is
             align_wh           : align_t;
             gap_r, gap_c       : Natural;
             expand_w, expand_h : expand_t;
+            expand_wc, expand_hc : expand_t; --child behavior
             width_pixel_left   : Natural      := LOT_Parent.w;
             height_pixel_left  : Natural      := LOT_Parent.h;
             total_portion      : Natural      := 0;
             nmbr_max           : Natural      := 0;
+            content_width      : Natural      := 0;
+            content_height     : Natural      := 0;
 
             procedure calculate_portions is
             begin
@@ -289,7 +291,23 @@ package body dui is
                                     width_pixel_left := 0;
                                 end if;
                             when content =>
-                                null;
+                                for j in Layout_Object_Tree.Iterate_Subtree(i) loop
+                                    if child_row then
+                                        expand_wc := LOT (j).self_flex.expand_w;
+                                        case expand_wc.behavior is
+                                            when portion =>
+                                                content_width := content_width + expand_wc.portion;
+                                            when pixel =>
+                                                content_width := content_width + expand_wc.pixel;
+                                            when percent =>
+                                                content_width := content_width + Natural(Float(LOT_Parent.w) * Float(expand_wc.percent));
+                                            when content =>
+                                                null;
+                                            when max =>
+                                                null;
+                                        end case;
+                                    end if;
+                                end loop;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -321,7 +339,23 @@ package body dui is
                                     height_pixel_left := 0;
                                 end if;
                             when content =>
-                                null;
+                                for j in Layout_Object_Tree.Iterate_Subtree(i) loop
+                                    if child_column then
+                                        expand_hc := LOT (j).self_flex.expand_h;
+                                        case expand_hc.behavior is
+                                            when portion =>
+                                                content_height := content_height + expand_hc.portion;
+                                            when pixel =>
+                                                content_height := content_height + expand_hc.pixel;
+                                            when percent =>
+                                                content_height := content_height + Natural(Float(LOT_Parent.h) * Float(expand_hc.percent));
+                                            when content =>
+                                                null;
+                                            when max =>
+                                                null;
+                                        end case;
+                                    end if;
+                                end loop;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -375,10 +409,9 @@ package body dui is
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    null;
+                                    LOT (i).all.Set_Width(content_width);
                                 when max =>
-                                    LOT (i).all.Set_Width
-                                       (width_pixel_left / nmbr_max);
+                                    LOT (i).all.Set_Width(width_pixel_left / nmbr_max);
                             end case;
                             case expand_h.behavior
                             is  -- update h in row context
@@ -392,7 +425,7 @@ package body dui is
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    null;
+                                    LOT (i).all.Set_Height (content_height);
                                 when max =>
                                     LOT (i).all.Set_Height (LOT_Parent.h);
                             end case;
@@ -415,8 +448,7 @@ package body dui is
                             end if;
 
                         else
-                            LOT (i).x :=
-                               0; --If overflow occured in a previous widget, zero out this widget.
+                            LOT (i).x := 0; --If overflow occured in a previous widget, zero out this widget.
                             LOT (i).y := 0;
                             LOT (i).w := 0;
                             LOT (i).h := 0;
@@ -452,10 +484,9 @@ package body dui is
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    null;
+                                    LOT (i).all.Set_Height(content_height);
                                 when max =>
-                                    LOT (i).all.Set_Height
-                                       (height_pixel_left / nmbr_max);
+                                    LOT (i).all.Set_Height(height_pixel_left / nmbr_max);
                             end case;
                             case expand_w.behavior
                             is -- update w in column context
@@ -469,7 +500,7 @@ package body dui is
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    null;
+                                    LOT (i).all.Set_Width (content_width);
                                 when max =>
                                     LOT (i).all.Set_Width (LOT_Parent.w);
                             end case;
@@ -529,6 +560,7 @@ package body dui is
                 space_evenly_y  : Natural := 0;
             begin
                 buoy_wh := LOT_Parent.child_flex.buoy;
+
                 case buoy_wh is
                     when space_between =>
                         for i in Layout_Object_Tree.Iterate_Children (LOT, c)
@@ -538,8 +570,7 @@ package body dui is
                         end loop;
 
                         space_between_x := (LOT_pw - c_total_width) / (cc - 1);
-                        space_between_y :=
-                           (LOT_ph - c_total_height) / (cc - 1);
+                        space_between_y := (LOT_ph - c_total_height) / (cc - 1);
                         for i in Layout_Object_Tree.Iterate_Children (LOT, c)
                         loop
                             if LOT_Parent.child_flex.dir = right_left then
@@ -684,7 +715,7 @@ package body dui is
                             end if;
                         end loop;
                     when space_nothing =>
-                        null;
+                        null; 
                     when others =>
                         null;
                 end case;
@@ -698,6 +729,75 @@ package body dui is
                    LOT_Parent
                       .y; -- variable to calculate the next y-coord of siblings when calculating left alignment
             begin
+                for i in Layout_Object_Tree.Iterate_Children(LOT, c) loop
+                    if LOT(i).self_flex.align = stretch or LOT(i).self_flex.align = center or LOT(i).self_flex.align = bottom or LOT(i).self_flex.align = left
+                    or LOT(i).self_flex.align = right then
+                        case LOT(i).self_flex.align is
+                            when stretch =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).h := LOT_ph;
+
+                                    when bottom_top | top_bottom =>
+                                        LOT (i).w := LOT_pw;
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when center =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).y := (LOT_ph - LOT (i).h) / 2;
+
+                                    when bottom_top | top_bottom =>
+                                        LOT (i).x :=
+                                        (LOT_pw / 2) - (LOT (i).w / 2);
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when bottom =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
+
+                                    when bottom_top | top_bottom =>
+                                        next_y    := next_y - LOT (i).h;
+                                        LOT (i).y := next_y;
+
+                                    when others =>
+                                        null;
+                            end case;
+                            when left =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).x := next_x;
+                                        next_x    := next_x + LOT (i).w;
+
+                                    when top_bottom | bottom_top =>
+                                        LOT (i).x := LOT_Parent.x;
+                                        LOT (i).y := next_y;
+                                        next_y    := next_y + LOT (i).h;
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when right =>
+                                case LOT_Parent.child_flex.dir is
+                                    when left_right | right_left =>
+                                        LOT (i).x := LOT_Parent.w - LOT (i).w;
+
+                                    when top_bottom | bottom_top =>
+                                        LOT (i).y := LOT_Parent.h - LOT (i).h;
+
+                                    when others =>
+                                        null;
+                                end case;
+                            when others =>
+                                null; -- No action for unspecified alignments
+                        end case;
+                    end if;
+                end loop;
                 align_wh := LOT_Parent.child_flex.align;
                 case align_wh is
                     when stretch =>
@@ -880,7 +980,7 @@ begin
     main_widget :=
        new Widget.Instance'
           (Controlled with id => +"main",
-           child_flex         => (dir => top_bottom, others => <>),
+           child_flex         => (dir => left_right, others => <>),
            bgd                => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);

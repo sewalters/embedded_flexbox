@@ -14,43 +14,50 @@ with Bitmapped_Drawing;
 with dui;                     use dui;
 with HAL;                     use HAL;
 with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
-procedure Embedded_Flexbox is
+procedure Test is
 
   
   header : Widget.Any_Acc :=
    Widget.Create
     (id         => "header", parent => dui.main_widget,
      self_flex  =>
-      (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
-     child_flex => (dir => bottom_top, gap_c => (pixel, 10), align => top,  others => <>), bgd => HAL.Bitmap.Red);
+      (expand_w => (behavior=> max), expand_h => (behavior => max), others => <>),
+     child_flex => (dir => left_right, gap_c => (pixel, 10), others => <>), bgd => HAL.Bitmap.Red);
   header2    : Widget.Any_Acc :=
    Widget.Create
-    (id         => "header", parent => header,
+    (id         => "green child", parent => header,
      self_flex  =>
-      (expand_w => (percent, 0.3), expand_h => (pixel, 200), others => <>),
+      (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Green);
-  header3    : Widget.Any_Acc :=
+     yeahyeah    : Widget.Any_Acc :=
    Widget.Create
-    (id         => "header", parent => header,
+    (id         => "white child", parent => header,
      self_flex  =>
-      (expand_w => (percent, 0.3), expand_h => (pixel, 50), others => <>),
+      (expand_w => (pixel, 50), expand_h => (pixel, 50),others => <>),
+     child_flex => (dir => left_right,  others => <>),
+     bgd        => HAL.Bitmap.White);
+     header3    : Widget.Any_Acc :=
+   Widget.Create
+    (id         => "blue child", parent => header,
+     self_flex  =>
+      (expand_w => (pixel, 50), expand_h => (pixel, 50), align => right, others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Blue);
-   text_example : Widget.Any_Acc :=
-      Widget.Text.Create
-      (id        => "Text", parent => header, text => "Example text",
-      self_flex =>
-         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
-   bt_example : Widget.Any_Acc :=
-      Widget.Button.Create
-      (id        => "BT", parent => header, text => "Button",
-      self_flex =>
-         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Purple);
+  --   text_example : Widget.Any_Acc :=
+  --      Widget.Text.Create
+  --      (id        => "Text", parent => header, text => "Example text",
+  --      self_flex =>
+  --         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
+  --   bt_example : Widget.Any_Acc :=
+      --  Widget.Button.Create
+      --  (id        => "BT", parent => header, text => "Button",
+      --  self_flex =>
+      --     (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Purple);
 begin
   --  stm32.Board.Display.Hidden_Buffer(1).Set_Source(HAL.Bitmap.Red);
   --  stm32.Board.Display.Hidden_Buffer(1).Fill_Rect(Area => ( Position => (0, 0), Width => 10, Height => 10));
   --  stm32.Board.Display.Update_Layers;
   dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 
-end Embedded_Flexbox;
+end Test;
