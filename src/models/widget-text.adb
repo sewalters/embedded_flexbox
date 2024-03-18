@@ -99,6 +99,8 @@ package body Widget.Text is
                 y_font_size := 24;
         end case;
 
+        if y_font_size <= This.h then
+
         case This.overflow is
             when default =>
                 -- STANDARD BEHAVIOR
@@ -213,6 +215,7 @@ package body Widget.Text is
                     Index := Index + Length (Word) + 1; -- Add 1 for the space separator
                 end loop;
         end case;
+        end if;
     end Draw;
 
 end Widget.Text;

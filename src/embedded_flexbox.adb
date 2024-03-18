@@ -39,7 +39,7 @@ procedure Embedded_Flexbox is
      bgd        => HAL.Bitmap.Blue);
    text_example : Widget.Any_Acc :=
       Widget.Text.Create
-      (id        => "Text", parent => header, text => "Example text",
+      (id        => "Text", parent => header, text => "ExampletextExampletextExampletextExampletextExampletextExampletext", overflow => wrap,
       self_flex =>
          (expand_w => (behavior => max), expand_h => (pixel, 30), others => <>));
    bt_example : Widget.Any_Acc :=
