@@ -21,7 +21,7 @@ procedure Test is
    Widget.Create
     (id         => "header", parent => dui.main_widget,
      self_flex  =>
-      (expand_w => (content, 400), expand_h => (pixel, 250), others => <>),
+      (expand_w => (behavior=> max), expand_h => (behavior => max), others => <>),
      child_flex => (dir => left_right, gap_c => (pixel, 10), others => <>), bgd => HAL.Bitmap.Red);
   header2    : Widget.Any_Acc :=
    Widget.Create
@@ -41,7 +41,7 @@ procedure Test is
    Widget.Create
     (id         => "blue child", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50), align => center, others => <>),
+      (expand_w => (pixel, 50), expand_h => (pixel, 50), align => right, others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Blue);
   --   text_example : Widget.Any_Acc :=

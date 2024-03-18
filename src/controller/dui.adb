@@ -296,11 +296,11 @@ package body dui is
                                         expand_wc := LOT (j).self_flex.expand_w;
                                         case expand_wc.behavior is
                                             when portion =>
-                                                null;
+                                                content_width := content_width + expand_wc.portion;
                                             when pixel =>
                                                 content_width := content_width + expand_wc.pixel;
                                             when percent =>
-                                                null;
+                                                content_width := content_width + Natural(Float(LOT_Parent.w) * Float(expand_wc.percent));
                                             when content =>
                                                 null;
                                             when max =>
@@ -339,13 +339,23 @@ package body dui is
                                     height_pixel_left := 0;
                                 end if;
                             when content =>
-                                nmbr_max := nmbr_max + 1;
-                                --if expand_h.pixel <= height_pixel_left then
-                                --    height_pixel_left :=
-                                --       height_pixel_left - expand_h.pixel;
-                                --else
-                                --    height_pixel_left := 0;
-                                --end if;
+                                for j in Layout_Object_Tree.Iterate_Subtree(i) loop
+                                    if child_column then
+                                        expand_hc := LOT (j).self_flex.expand_h;
+                                        case expand_hc.behavior is
+                                            when portion =>
+                                                content_height := content_height + expand_hc.portion;
+                                            when pixel =>
+                                                content_height := content_height + expand_hc.pixel;
+                                            when percent =>
+                                                content_height := content_height + Natural(Float(LOT_Parent.h) * Float(expand_hc.percent));
+                                            when content =>
+                                                null;
+                                            when max =>
+                                                null;
+                                        end case;
+                                    end if;
+                                end loop;
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -775,18 +785,10 @@ package body dui is
                             when right =>
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
-                                        next_x := next_x - LOT (i).w;
-
-                                    if next_x >= LOT_Parent.x then
-                                        LOT (i).x := next_x;
-
-                                    end if;
+                                        LOT (i).x := LOT_Parent.w - LOT (i).w;
 
                                     when top_bottom | bottom_top =>
-                                        LOT (i).x :=
-                                       LOT_Parent.x + LOT_Parent.w - LOT (i).w;
-                                        LOT (i).y := next_y;
-                                        next_y    := next_y + LOT (i).h;
+                                        LOT (i).y := LOT_Parent.h - LOT (i).h;
 
                                     when others =>
                                         null;

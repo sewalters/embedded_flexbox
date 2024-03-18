@@ -23,40 +23,40 @@ procedure Embedded_Flexbox is
      self_flex  =>
       (expand_w => (behavior => content), expand_h => (behavior => max), others => <>),
      child_flex => (dir => left_right, align => top,  others => <>), bgd => HAL.Bitmap.Red);
-  second_header : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => dui.main_widget,
-     self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (behavior => max), others => <>),
-     child_flex => (dir => left_right, align => top,  others => <>), bgd => HAL.Bitmap.White);
+--    second_header : Widget.Any_Acc :=
+   --  Widget.Create
+   --   (id         => "header", parent => dui.main_widget,
+   --    self_flex  =>
+   --     (expand_w => (pixel, 30), expand_h => (behavior => max), others => <>),
+   --    child_flex => (dir => left_right, align => top,  others => <>), bgd => HAL.Bitmap.White);
   header2    : Widget.Any_Acc :=
    Widget.Create
     (id         => "header", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 200), others => <>),
+      (expand_w => (percent, 0.3), expand_h => (pixel, 200), others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Green);
   header3    : Widget.Any_Acc :=
    Widget.Create
     (id         => "header", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 100), expand_h => (pixel, 100), others => <>),
+      (expand_w => (percent, 0.3), expand_h => (pixel, 50), others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Blue);
-  header4    : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header,
-     self_flex  =>
-      (expand_w => (pixel, 150), expand_h => (pixel, 150), others => <>),
-     child_flex => (dir => left_right,  others => <>),
-     bgd        => HAL.Bitmap.Yellow);
-  header5    : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header4,
-     self_flex  =>
-      (expand_w => (pixel, 100), expand_h => (pixel, 50), others => <>),
-     child_flex => (dir => left_right,  others => <>),
-     bgd        => HAL.Bitmap.Purple);
+--    header4    : Widget.Any_Acc :=
+--     Widget.Create
+--      (id         => "header", parent => header,
+--       self_flex  =>
+--        (expand_w => (pixel, 150), expand_h => (pixel, 150), others => <>),
+--       child_flex => (dir => left_right,  others => <>),
+--       bgd        => HAL.Bitmap.Yellow);
+--    header5    : Widget.Any_Acc :=
+   --  Widget.Create
+   --   (id         => "header", parent => header4,
+   --    self_flex  =>
+   --     (expand_w => (pixel, 100), expand_h => (pixel, 50), others => <>),
+   --    child_flex => (dir => left_right,  others => <>),
+   --    bgd        => HAL.Bitmap.Purple);
    --  header3    : Widget.Any_Acc :=
    --Widget.Create
    -- (id         => "header", parent => header,
