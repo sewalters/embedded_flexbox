@@ -21,7 +21,7 @@ procedure Embedded_Flexbox is
    Widget.Create
     (id         => "header", parent => dui.main_widget,
      self_flex  =>
-      (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
+      (expand_w => (behavior => content), expand_h => (behavior => max), others => <>),
      child_flex => (dir => top_bottom, align => top, others => <>), bgd => HAL.Bitmap.Red);
   header2    : Widget.Any_Acc :=
    Widget.Create
