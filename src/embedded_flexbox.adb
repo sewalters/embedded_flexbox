@@ -21,7 +21,7 @@ procedure Embedded_Flexbox is
    Widget.Create
     (id         => "header", parent => dui.main_widget,
      self_flex  =>
-      (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
+      (expand_w => (percent, 0.5), expand_h => (behavior => max), others => <>),
      child_flex => (dir => bottom_top, gap_c => (pixel, 10), align => top,  others => <>), bgd => HAL.Bitmap.Red);
   header2    : Widget.Any_Acc :=
    Widget.Create
@@ -39,14 +39,19 @@ procedure Embedded_Flexbox is
      bgd        => HAL.Bitmap.Blue);
    text_example : Widget.Any_Acc :=
       Widget.Text.Create
-      (id        => "Text", parent => header, text => "Example text",
+      (id        => "Text", parent => header, text => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", text_spacing => (percent , 0.25),
       self_flex =>
-         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
+         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), overflow => wrap);
    bt_example : Widget.Any_Acc :=
       Widget.Button.Create
-      (id        => "BT", parent => header, text => "Button",
+      (id        => "BT", parent => header, text => "Button Button Button Button Button Button ",
       self_flex =>
          (expand_w => (behavior => max), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Purple);
+  text_example2 : Widget.Any_Acc :=
+      Widget.Text.Create
+      (id        => "Text", parent => header3, text => "Truncate", overflow => truncate,
+      self_flex =>
+         (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
 begin
   --  stm32.Board.Display.Hidden_Buffer(1).Set_Source(HAL.Bitmap.Red);
   --  stm32.Board.Display.Hidden_Buffer(1).Fill_Rect(Area => ( Position => (0, 0), Width => 10, Height => 10));
