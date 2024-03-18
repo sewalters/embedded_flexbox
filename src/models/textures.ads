@@ -25,7 +25,7 @@ with HAL; use HAL;
 
 package Textures is
 
-   Texture_Size : constant := 128;
+   Texture_Size : constant := 256;
 
    type Texture_Column is array (0 .. Texture_Size - 1) of UInt16
      with Component_Size => 16;

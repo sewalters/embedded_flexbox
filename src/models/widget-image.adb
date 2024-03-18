@@ -53,9 +53,10 @@ package body Widget.Image is
         use dui;
         image_Acc : Texture_Access := Texture_Factory.procure_texture(+This.image);
     begin
+        -- DRAW w/ TRUNCATION
         for I in image_Acc'Range loop
         declare
-            col : Texture_Column := image_Acc (I);
+            col : Texture_Column_Access := image_Acc (I)'Access;
             begin
             for J in col'Range loop
                 declare
@@ -72,6 +73,23 @@ package body Widget.Image is
             end loop;
             end;
         end loop;
+
+        -- DOWNSAMPLE DRAW (1/2 size)
+        --  for I in 1 .. 128 loop
+        --    for J in 1 .. 128 loop
+        --      declare
+        --        shiftI : Natural := I * 2;
+        --        shiftJ : Natural := J * 2;
+        --        pixel_color : Bitmap_Color := Word_To_Bitmap_Color(Mode => ARGB_1555, Col => UINT32(image_Acc(shiftI)(shiftJ)));
+        --      begin
+        --      if(This.x + I <= This.x + This.w) and (This.y + J <= This.y + this.h) then
+        --            img.Set_Source (pixel_color);
+        --            img.Set_Pixel (Pt => (This.x + I, This.y + J));
+        --      end if;
+        --      end;            
+        --    end loop;
+        
+        --  end loop;
 
     end Draw;
 
