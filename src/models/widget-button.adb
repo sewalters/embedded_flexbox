@@ -66,7 +66,9 @@ package body Widget.Button is
         if This.state = idle then
             This.state := clicking;
             This.bgd := This.colors(clicking);
-            This.button_text.bgd := This.colors(clicking);
+            if This.button_text /= null then
+                This.button_text.bgd := This.colors(clicking);
+            end if;
             --Put_Line("I am a button widget.");
         end if;
     end Click;
@@ -82,7 +84,9 @@ package body Widget.Button is
         if This.state = clicking then
             This.state := idle;
             This.bgd := This.colors(idle);
-            This.button_text.bgd := This.colors(idle);
+            if This.button_text /= null then
+                This.button_text.bgd := This.colors(idle);
+            end if;
         end if;
     end release_click;
 

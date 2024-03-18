@@ -15,8 +15,11 @@ package dui is
     LOT         : Layout_Object_Tree.Tree;
     LOT_Root    : Layout_Object_Tree.Cursor := LOT.Root;
     main_widget : Widget.Any_Acc;
-    type event_states is (idle, press);
+    type event_states is (idle, press, resize);
     event_state : event_states := idle;
+    update_render : Boolean := false;
+    start_dist : Float;
+    start_w, start_h : Natural;
 
     --img : graphic.image_access := new graphic.image(1 .. 1920, 1 .. 1080);
 

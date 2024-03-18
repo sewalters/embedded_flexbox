@@ -149,6 +149,12 @@ package body dui is
 
         procedure render_node is
         begin
+            -- For "clearing" the screen for resizing
+            STM32.Board.Display.Hidden_Buffer (1).Set_Source (Hal.Bitmap.Black);
+            STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
+                (Area =>
+                    (Position => (0, 0), Width => window_width,
+                    Height   => window_height));
             for C in LOT.Iterate loop
                 declare
                 w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
@@ -784,7 +790,7 @@ package body dui is
                 (HAL.Bitmap.Green);
 
             if State'Length = 0 and event_state = idle then
-                null;
+                update_render := false;
             elsif State'Length = 1 and event_state = idle then
                 null; -- button press here
                 -- call observer button press event procedure
@@ -799,6 +805,7 @@ package body dui is
                     end if;
                 end loop;
                 event_state := press;
+                update_render := true;
             elsif State'Length = 1 and event_state = press then
                 null; -- idling in press (same press but waiting)
             elsif State'Length = 0 and event_state = press then
@@ -812,25 +819,69 @@ package body dui is
                     end if;
                 end loop;
                 event_state := idle;
-            elsif State'Length = 2 then
-                --  declare
-                --      x1, x2, y1, y2, tx, ty, dt : Natural := 0;
-                --      ft : Float := 0.0;
-                --  begin
-                --      x1 := State (1).X;
-                --      y1 := State (1).Y;
-                --      x2 := State (2).X;
-                --      y2 := State (2).Y;
-                --      tx := x2 - x1;
-                --      ty := y2 - y1;
-                --      tx := tx ** 2;
-                --      ty := ty ** 2;
-                --      ft := Float(tx) + Float(ty);
-                --      dt := Natural(Sqrt (ft));
-                --      STM32.Board.Display.Hidden_Buffer (1).Fill_Rounded_Rect
-                --      (((x1, y1), dt, dt), dt / 2);
-                --  end;
-                null;
+            elsif State'Length = 2 and event_state /= resize then
+                event_state := resize;
+                -- set a starting point for each touch point
+                declare
+                    tx, ty : Integer := 0;
+                    ft : Float := 0.0;
+                    start_x1 : Natural := State (1).X;
+                    start_y1 : Natural := State (1).Y;
+                    start_x2 : Natural := State (2).X;
+                    start_y2 : Natural := State (2).Y;
+                begin
+                    tx := Integer(start_x2) - Integer(start_x1);
+                    ty := Integer(start_y2) - Integer(start_y1);
+                    tx := tx ** 2;
+                    ty := ty ** 2;
+                    ft := Float(tx) + Float(ty);
+                    start_dist := Sqrt (ft);
+                    start_w := LOT (Layout_Object_Tree.First_Child (LOT.Root)).w;
+                    start_h := LOT (Layout_Object_Tree.First_Child (LOT.Root)).h;
+                end;
+            elsif State'Length = 2 and event_state = resize then
+                declare
+                    tx, ty : Integer := 0;
+                    dt : Float := 0.0;
+                    ft : Float := 0.0;
+                    x1 : Natural := State (1).X;
+                    y1 : Natural := State (1).Y;
+                    x2 : Natural := State (2).X;
+                    y2 : Natural := State (2).Y;
+                begin
+                    --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (Hal.Bitmap.Black);
+                    --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
+                    --     (Area =>
+                    --         (Position => (0, 0), Width => window_width,
+                    --          Height   => window_height));
+                    tx := Integer(x2) - Integer(x1);
+                    ty := Integer(y2) - Integer(y1);
+                    tx := tx ** 2;
+                    ty := ty ** 2;
+                    ft := Float(tx) + Float(ty);
+                    dt := Sqrt (ft);
+                    if dt /= start_dist then
+                        -- stretch and squish
+                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := Natural(Float(start_w) * (dt / start_dist));
+                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := Natural(Float(start_h) * (dt / start_dist));
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w > window_width then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
+                        end if;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h > window_height then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
+                        end if;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w <= 0 then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := 1;
+                        end if;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h <= 0 then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := 1;
+                        end if;
+                    end if;
+                    --STM32.Board.Display.Update_Layer (1);
+                    update_render := true;
+                end;
+            elsif State'Length < 2 and event_state = resize then
+                event_state := idle;
             else
                 null;
             end if;
@@ -841,20 +892,23 @@ package body dui is
             
         end poll_events;
 
-        --      Start_Time   : Time;
-        --      Elapsed_Time : Time_Span;
+        --  Start_Time   : Time;
+        --  Elapsed_Time : Time_Span;
 
     begin
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
-            Layout_Object_Tree.Iterate (LOT, compute_node'Access);
-            render_node;
+            for i in 1 .. 2 loop
+                Layout_Object_Tree.Iterate (LOT, compute_node'Access);
+                render_node;
+            end loop;
         loop
+            --Start_Time := Clock;
             poll_events;
-            --      Start_Time                                        := Clock;
             --LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
             --LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
-            Layout_Object_Tree.Iterate (LOT, compute_node'Access);
+            if update_render then
+                Layout_Object_Tree.Iterate (LOT, compute_node'Access);
             --Layout_Object_Tree.Iterate (LOT, render_node'Access);
 
             --  for C in LOT.Iterate loop
@@ -868,16 +922,19 @@ package body dui is
             --  end;
             --  end loop;
 
-            render_node;
+                render_node;
+            end if;
 
             -- Move Buffered layer to visible layer.
-            --STM32.Board.Display.Update_Layer(1);
-            --      Layout_Object_Tree.Iterate (LOT, debug_dui'Access);
-            --      --Layout_Object_Tree.Iterate (LOT, test'access);
-            --      Elapsed_Time := Clock - Start_Time;
-            --      -- Put_Line ("Elapsed time (whole dui): "
-            --      --    & Duration'Image (To_Duration (Elapsed_Time))
-            --      --    & " seconds");
+            --  STM32.Board.Display.Update_Layer(1);
+
+            --  Layout_Object_Tree.Iterate (LOT, debug_dui'Access);
+            --  Layout_Object_Tree.Iterate (LOT, test'access);
+            
+            --  Elapsed_Time := Clock - Start_Time;
+            --  Put_Line ("Elapsed time (whole dui): "
+            --    & Duration'Image (To_Duration (Elapsed_Time))
+            --    & " seconds");
 
         end loop;
     end render;
