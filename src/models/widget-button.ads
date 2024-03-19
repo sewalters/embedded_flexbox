@@ -1,5 +1,6 @@
 with Ada.Strings.Unbounded;
 with Hal.Bitmap; use Hal.Bitmap;
+with Widget.Text; use Widget.Text;
 
 package Widget.Button is
 
@@ -25,14 +26,12 @@ package Widget.Button is
    function Create (id            : string;
                     parent        : Widget.Any_Acc;
                     text          : string := "";
+                     overflow_text : text_overflow := truncate;
                     self_flex     : flex_t  := default_flex;
                     child_flex    : flex_t  := default_flex;
                     min_height, min_width : Natural := 0;
                     max_height, max_width : Natural := Natural'Last;
                     bgd           : Bitmap_Color) return Widget.Any_Acc;
-
-   --  overriding
-   --  procedure Event (This : in out Instance; Evt : Event_Kind);
 
    overriding
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);

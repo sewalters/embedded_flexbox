@@ -7,18 +7,12 @@ with HAL.Touch_Panel;         use HAL.Touch_Panel;
 with BMP_Fonts;
 with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 with HAL.Framebuffer;
-with Bitmapped_Drawing; use Bitmapped_Drawing;
-with Ada.Numerics; use Ada.Numerics;
+with Bitmapped_Drawing;       use Bitmapped_Drawing;
+with Ada.Numerics;            use Ada.Numerics;
 
-with Ada.Numerics.Elementary_Functions;
-use  Ada.Numerics.Elementary_Functions;
+with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
---with font;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
---with importer; -- Removed, still compiled.
-
---with namespaces; use namespaces;
 
 with Widget;
 with Widget.Button;
@@ -32,186 +26,58 @@ package body dui is
            (dui.Layout_Object_Tree.Find (dui.LOT, Parent), Widget);
     end add_to_LOT;
 
-    --  procedure draw_image
-    --     (target : in out g.image; img : in out g.image_access; x, y : Natural;
-    --      w, h   :        Natural)
-    --  is
-    --      it, jt : Integer;
-    --  begin
-    --      for j in img'Range (2) loop
-    --          for i in img'Range (1) loop
-    --              it := x + i;
-    --              jt := y + j;
-    --              if it <= x + w and jt <= y + h then
-    --                   (it, jt) := img (i, j);
-    --              end if;
-    --          end loop;
-    --      end loop;
-    --  exception
-    --      when others =>
-    --          Put_Line ("ij: " & it'Image & " jt: " & jt'Image);
-    --  end draw_image;
-
-    --  procedure draw_rect
-    --     (target : in out g.image; x, y : Natural; w, h : Natural; c : g.color)
-    --  is
-    --      Xb     : constant Integer := x;
-    --      Xe     : constant Integer := x + w - 1;
-    --      Yb     : constant Integer := y;
-    --      Ye     : constant Integer := y + h - 1;
-    --      Wx     : Integer          := Layout_Object_Tree.Element (LOT_Root).w;
-    --      Wy     : Integer          := Layout_Object_Tree.Element (LOT_Root).h;
-    --      ic, jc : Integer;
-    --  begin
-    --      --      Put_Line("Xb" & Natural'Image(Xb));
-    --      --      Put_Line("Xe" & Natural'Image(Xe));
-    --      --      Put_Line("Yb" & Natural'Image(Yb));
-    --      --      Put_Line("Ye" & Natural'Image(Ye));
-    --      for I in Xb .. Xe loop
-    --          for J in Yb .. Ye loop
-    --              ic := I;
-    --              jc := J;
-    --              if ((I < Wx and J < Wy) and ((I > 0) and (J > 0))) then
-    --                  target (I, J) := c;
-    --              end if;
-    --          end loop;
-    --      end loop;
-    --  exception
-    --      when others =>
-    --          Put_Line ("i: " & ic'Image & " J: " & jc'Image);
-    --  end draw_rect;
-
-    --  procedure draw_character
-    --     (c    : Character; magnification : Natural; target : in out g.image;
-    --      x, y : Natural; color : g.color)
-    --  is
-    --      x_font : constant Integer := font.get_font_char_start (c);
-    --      y_font : constant Integer := 1;
-    --      use g;
-    --  begin
-    --      for fj in font.bitmap_height_t'First .. font.bitmap_base loop
-    --          for fi in font.bitmap_width_t'First .. font.bitmap_base loop
-    --              --Put_Line (font.font_1_img (x_font + fi - 1, y_font + fj - 1)'image);
-    --              --Put_Line (g.color_val'last'image);
-    --              if font.font_1_img (x_font + fi - 1, y_font + fj - 1) = g.white
-    --              then
-    --                  for mj in 1 .. magnification loop
-    --                      for mi in 1 .. magnification loop
-    --                          target
-    --                             (x + (fi * magnification) + mi - 1,
-    --                              y + (fj * magnification) + mj - 1) :=
-    --                             color;
-    --                      end loop;
-    --                  end loop;
-    --              end if;
-    --          end loop;
-    --      end loop;
-    --  end draw_character;
-
-    --  procedure draw_text
-    --     (target : in out g.image; text : String; magnification : Natural;
-    --      x, y   :        Natural; color : g.color)
-    --  is
-    --      use g;
-    --  begin
-    --      for c in text'Range loop
-    --          declare
-    --              i : Natural :=
-    --                 x + (c - 1) * (magnification * (font.bitmap_base + 1));
-    --              j : Natural := y;
-    --          begin
-    --              draw_character (text (c), magnification, target, i, j, color);
-    --          end;
-    --      end loop;
-    --  exception
-    --      when others =>
-    --          Put_Line ("draw text problem!");
-    --  end draw_text;
-
     -- need a pass from leaf to root to compute intrinsic, inner content width and height
 
     procedure render (window_width : Natural; window_height : Natural) is
 
-        --      procedure debug_dui (c : Layout_Object_Tree.Cursor) is
-        --          id : Unbounded_String := Layout_Object_Tree.Element (c).id;
-        --          x  : Natural          := Layout_Object_Tree.Element (c).x;
-        --          y  : Natural          := Layout_Object_Tree.Element (c).y;
-        --          w  : Natural          := Layout_Object_Tree.Element (c).w;
-        --          h  : Natural          := Layout_Object_Tree.Element (c).h;
-        --      begin
-        --          Put_Line ("Widget id: " & To_String (id));
-        --          Put_Line ("x: " & Natural'Image (x));
-        --          Put_Line ("y: " & Natural'Image (y));
-        --          Put_Line ("width: " & Natural'Image (w));
-        --          Put_Line ("height: " & Natural'Image (h));
-        --          Put_Line ("");
-        --      end debug_dui;
-
         procedure render_node is
         begin
             -- For "clearing" the screen for resizing
-            STM32.Board.Display.Hidden_Buffer (1).Set_Source (Hal.Bitmap.Black);
+            STM32.Board.Display.Hidden_Buffer (1).Set_Source
+               (HAL.Bitmap.Black);
             STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-                (Area =>
-                    (Position => (0, 0), Width => window_width,
+               (Area =>
+                   (Position => (0, 0), Width => window_width,
                     Height   => window_height));
             for C in LOT.Iterate loop
                 declare
-                w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
+                    w : Widget.Any_Acc := Layout_Object_Tree.Element (C);
                 begin
-                    --480x272
-                    --  if w.x < 0 or w.x > (480 - w.w) then
-                    --      w.x := 0;
-                    --  end if;
-                    --  if w.y < 0 or w.y > (272 - w.h) then
-                    --      w.y := 0;
-                    --  end if;
-                    Layout_Object_Tree.Element (c).Draw
+                    Layout_Object_Tree.Element (C).Draw
                        (img => STM32.Board.Display.Hidden_Buffer (1).all);
-                    --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (w.bgd);
-                    --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-                    --     (Area =>
-                    --         (Position => (w.x, w.y), Width => w.w,
-                    --          Height   => w.h));
                 end;
             end loop;
             STM32.Board.Display.Update_Layer (1);
         end render_node;
 
-        --      procedure test (c : Layout_Object_Tree.Cursor) is
-        --      begin
-        --          if Layout_Object_Tree.Element (c).all in Loadable'Class then
-        --              Loadable'Class (Layout_Object_Tree.Element (c).all).Load;
-        --          end if;
-        --      end test;
-
         procedure compute_node (c : Layout_Object_Tree.Cursor) is
-            cc                 : Natural      := Natural (Layout_Object_Tree.Child_Count (c));
-            LOT_Parent         : Widget.Class := Layout_Object_Tree.Element (c).all; --parent
-            LOT_pw             : Natural      := LOT_Parent.w; --parent width
-            LOT_ph             : Natural      := LOT_Parent.h; --parent height
-            LOT_ox             : Natural      := LOT_Parent.x; --x offset for calculations
-            LOT_oy             : Natural      := LOT_Parent.y; --y offset for calculations
-            child_row          : Boolean      :=
+            cc : Natural      := Natural (Layout_Object_Tree.Child_Count (c));
+            LOT_Parent           : Widget.Class :=
+               Layout_Object_Tree.Element (c).all; --parent
+            LOT_pw               : Natural      := LOT_Parent.w; --parent width
+            LOT_ph               : Natural := LOT_Parent.h; --parent height
+            LOT_ox : Natural      := LOT_Parent.x; --x offset for calculations
+            LOT_oy : Natural      := LOT_Parent.y; --y offset for calculations
+            child_row            : Boolean      :=
                (LOT_Parent.child_flex.dir = left_right or
                 LOT_Parent.child_flex.dir = right_left);
-            child_column       : Boolean      :=
+            child_column         : Boolean      :=
                (LOT_Parent.child_flex.dir = top_bottom or
                 LOT_Parent.child_flex.dir = bottom_top);
-            child_depth        : Boolean      :=
+            child_depth          : Boolean      :=
                (LOT_Parent.child_flex.dir = front_back or
                 LOT_Parent.child_flex.dir = back_front);
-            buoy_wh            : buoy_t;
-            align_wh           : align_t;
-            gap_r, gap_c       : Natural;
-            expand_w, expand_h : expand_t;
+            buoy_wh              : buoy_t;
+            align_wh             : align_t;
+            gap_r, gap_c         : Natural;
+            expand_w, expand_h   : expand_t;
             expand_wc, expand_hc : expand_t; --child behavior
-            width_pixel_left   : Natural      := LOT_Parent.w;
-            height_pixel_left  : Natural      := LOT_Parent.h;
-            total_portion      : Natural      := 0;
-            nmbr_max           : Natural      := 0;
-            content_width      : Natural      := 0;
-            content_height     : Natural      := 0;
+            width_pixel_left     : Natural      := LOT_Parent.w;
+            height_pixel_left    : Natural      := LOT_Parent.h;
+            total_portion        : Natural      := 0;
+            nmbr_max             : Natural      := 0;
+            content_width        : Natural      := 0;
+            content_height       : Natural      := 0;
 
             procedure calculate_portions is
             begin
@@ -263,16 +129,27 @@ package body dui is
                                     width_pixel_left := 0;
                                 end if;
                             when content =>
-                                for j in Layout_Object_Tree.Iterate_Subtree(i) loop
+                                for j in Layout_Object_Tree.Iterate_Subtree (i)
+                                loop
                                     if child_row then
-                                        expand_wc := LOT (j).self_flex.expand_w;
+                                        expand_wc :=
+                                           LOT (j).self_flex.expand_w;
                                         case expand_wc.behavior is
                                             when portion =>
-                                                content_width := content_width + expand_wc.portion;
+                                                content_width :=
+                                                   content_width +
+                                                   expand_wc.portion;
                                             when pixel =>
-                                                content_width := content_width + expand_wc.pixel;
+                                                content_width :=
+                                                   content_width +
+                                                   expand_wc.pixel;
                                             when percent =>
-                                                content_width := content_width + Natural(Float(LOT_Parent.w) * Float(expand_wc.percent));
+                                                content_width :=
+                                                   content_width +
+                                                   Natural
+                                                      (Float (LOT_Parent.w) *
+                                                       Float
+                                                          (expand_wc.percent));
                                             when content =>
                                                 null;
                                             when max =>
@@ -311,16 +188,27 @@ package body dui is
                                     height_pixel_left := 0;
                                 end if;
                             when content =>
-                                for j in Layout_Object_Tree.Iterate_Subtree(i) loop
+                                for j in Layout_Object_Tree.Iterate_Subtree (i)
+                                loop
                                     if child_column then
-                                        expand_hc := LOT (j).self_flex.expand_h;
+                                        expand_hc :=
+                                           LOT (j).self_flex.expand_h;
                                         case expand_hc.behavior is
                                             when portion =>
-                                                content_height := content_height + expand_hc.portion;
+                                                content_height :=
+                                                   content_height +
+                                                   expand_hc.portion;
                                             when pixel =>
-                                                content_height := content_height + expand_hc.pixel;
+                                                content_height :=
+                                                   content_height +
+                                                   expand_hc.pixel;
                                             when percent =>
-                                                content_height := content_height + Natural(Float(LOT_Parent.h) * Float(expand_hc.percent));
+                                                content_height :=
+                                                   content_height +
+                                                   Natural
+                                                      (Float (LOT_Parent.h) *
+                                                       Float
+                                                          (expand_hc.percent));
                                             when content =>
                                                 null;
                                             when max =>
@@ -381,9 +269,10 @@ package body dui is
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Width(content_width);
+                                    LOT (i).all.Set_Width (content_width);
                                 when max =>
-                                    LOT (i).all.Set_Width(width_pixel_left / nmbr_max);
+                                    LOT (i).all.Set_Width
+                                       (width_pixel_left / nmbr_max);
                             end case;
                             case expand_h.behavior
                             is  -- update h in row context
@@ -404,10 +293,10 @@ package body dui is
 
                             if (LOT_ox + LOT (i).w + gap_c) > right_boundary
                             then
-                            --Overflow is occuring. First check if overflow occurs with or without gap.
-                                if (Lot_ox + LOT (i).w) > right_boundary
+                                --Overflow is occuring. First check if overflow occurs with or without gap.
+                                if (LOT_ox + LOT (i).w) > right_boundary
                                 then --Checking if overflow occurs without gap.
-                                --If it does, then we resize widget to fit remaining space.
+                                    --If it does, then we resize widget to fit remaining space.
                                     LOT (i).w := right_boundary - LOT_ox;
                                 end if;
 
@@ -420,23 +309,12 @@ package body dui is
                             end if;
 
                         else
-                            LOT (i).x := 0; --If overflow occured in a previous widget, zero out this widget.
+                            LOT (i).x :=
+                               0; --If overflow occured in a previous widget, zero out this widget.
                             LOT (i).y := 0;
                             LOT (i).w := 0;
                             LOT (i).h := 0;
                         end if;
-
-                        --  if LOT_ox >= 480 then
-                        --      null;
-                        --  elsif LOT_ox + LOT(i).w + gap_c > 480 then
-                        --       --Overflow occuring, need to provide remaining width to current widget, set LOT_ox to 480.
-                        --       LOT(i).w := (LOT_pw + LOT_Parent.x) - LOT_ox;
-                        --       LOT_ox := 480;
-                        --  elsif LOT_ox + LOT(i).w + gap_c <= 480 then
-                        --      LOT_ox := LOT_ox + LOT (i).w + gap_c;
-                        --  else
-                        --      null;
-                        --  end if;
 
                     elsif child_column then
 
@@ -456,9 +334,10 @@ package body dui is
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Height(content_height);
+                                    LOT (i).all.Set_Height (content_height);
                                 when max =>
-                                    LOT (i).all.Set_Height(height_pixel_left / nmbr_max);
+                                    LOT (i).all.Set_Height
+                                       (height_pixel_left / nmbr_max);
                             end case;
                             case expand_w.behavior
                             is -- update w in column context
@@ -479,9 +358,9 @@ package body dui is
 
                             if (LOT_oy + LOT (i).h + gap_r) > bottom_boundary
                             then
-                            --Overflow occuring, first check if it occurs with or without gap.
-                                if (Lot_oy + LOT (i).h) > bottom_boundary then
-                                --If it does, resize widget to fill remaining space.
+                                --Overflow occuring, first check if it occurs with or without gap.
+                                if (LOT_oy + LOT (i).h) > bottom_boundary then
+                                    --If it does, resize widget to fill remaining space.
                                     LOT (i).h := bottom_boundary - LOT_oy;
                                 end if;
 
@@ -500,18 +379,6 @@ package body dui is
                             LOT (i).w := 0;
                             LOT (i).h := 0;
                         end if;
-
-                        --  if LOT_oy > 272 then
-                        --      null;
-                        --  else
-                        --      if LOT_oy + LOT(i).h + gap_r <= 272 then
-                        --          LOT_oy := LOT_oy + LOT (i).h + gap_r;
-                        --      elsif LOT_oy + LOT(i).h + gap_r > 272 then
-                        --          --Overflow occured, provide remainder of height to current child and zero out any remaining children.
-                        --          LOT(i).h := (LOT_ph + LOT_Parent.y) - LOT_oy;
-                        --          LOT_oy := 273;
-                        --      end if;
-                        --  end if;
 
                     elsif child_depth then
                         null;
@@ -541,17 +408,29 @@ package body dui is
                             c_total_height := LOT (i).h + c_total_height;
                         end loop;
 
-                        space_between_x := (LOT_pw - c_total_width) / (cc - 1);
-                        space_between_y := (LOT_ph - c_total_height) / (cc - 1);
+                        if ((LOT_pw - c_total_width) / (cc - 1)) >= 0 then
+                            space_between_x :=
+                               (LOT_pw - c_total_width) / (cc - 1);
+                        else
+                            space_between_x := 0;
+                        end if;
+                        if ((LOT_ph - c_total_height) / (cc - 1)) >= 0 then
+                            space_between_y :=
+                               (LOT_ph - c_total_height) / (cc - 1);
+                        else
+                            space_between_y := 0;
+                        end if;
+
                         for i in Layout_Object_Tree.Iterate_Children (LOT, c)
                         loop
                             if LOT_Parent.child_flex.dir = right_left then
                                 if r_width = 0 then
                                     r_width := LOT (i).x;
                                 else
-                                    LOT (i).x :=
-                                       r_width - space_between_x - LOT (i).w;
-                                    r_width   := LOT (i).x;
+                                        LOT (i).x :=
+                                           r_width - space_between_x -
+                                           LOT (i).w;
+                                        r_width   := LOT (i).x;
                                 end if;
                             elsif LOT_Parent.child_flex.dir = left_right then
                                 if r_width = 0 then
@@ -575,8 +454,9 @@ package body dui is
                                 if r_height = 0 then
                                     r_height := LOT (i).h + LOT (i).y;
                                 else
-                                    LOT (i).y := space_between_y + r_height;
-                                    r_height  := LOT (i).h + LOT (i).y;
+                                        LOT (i).y :=
+                                           space_between_y + r_height;
+                                        r_height  := LOT (i).h + LOT (i).y;
                                 end if;
                             else
                                 null;
@@ -588,8 +468,18 @@ package body dui is
                             c_total_width  := LOT (i).w + c_total_width;
                             c_total_height := LOT (i).h + c_total_height;
                         end loop;
-                        space_around_x := (LOT_pw - c_total_width) / (2 * cc);
-                        space_around_y := (LOT_ph - c_total_height) / (2 * cc);
+                        if ((LOT_pw - c_total_width) / (2 * cc)) >= 0 then
+                            space_around_x :=
+                               (LOT_pw - c_total_width) / (2 * cc);
+                        else
+                            space_around_x := 0;
+                        end if;
+                        if ((LOT_ph - c_total_height) / (2 * cc)) >= 0 then
+                            space_around_y :=
+                               (LOT_ph - c_total_height) / (2 * cc);
+                        else
+                            space_around_y := 0;
+                        end if;
                         for i in Layout_Object_Tree.Iterate_Children (LOT, c)
                         loop
                             if LOT_Parent.child_flex.dir = right_left then
@@ -641,8 +531,18 @@ package body dui is
                             c_total_width  := LOT (i).w + c_total_width;
                             c_total_height := LOT (i).h + c_total_height;
                         end loop;
-                        space_evenly_x := (LOT_pw - c_total_width) / (cc + 1);
-                        space_evenly_y := (LOT_ph - c_total_height) / (cc + 1);
+                        if ((LOT_pw - c_total_width) / (cc + 1)) >= 0 then
+                            space_evenly_x :=
+                               (LOT_pw - c_total_width) / (cc + 1);
+                        else
+                            space_evenly_x := 0;
+                        end if;
+                        if ((LOT_ph - c_total_height) / (cc + 1)) >= 0 then
+                            space_evenly_y :=
+                               (LOT_ph - c_total_height) / (cc + 1);
+                        else
+                            space_evenly_y := 0;
+                        end if;
                         for i in Layout_Object_Tree.Iterate_Children (LOT, c)
                         loop
                             if LOT_Parent.child_flex.dir = right_left then
@@ -687,7 +587,7 @@ package body dui is
                             end if;
                         end loop;
                     when space_nothing =>
-                        null; 
+                        null;
                     when others =>
                         null;
                 end case;
@@ -701,10 +601,14 @@ package body dui is
                    LOT_Parent
                       .y; -- variable to calculate the next y-coord of siblings when calculating left alignment
             begin
-                for i in Layout_Object_Tree.Iterate_Children(LOT, c) loop
-                    if LOT(i).self_flex.align = stretch or LOT(i).self_flex.align = center or LOT(i).self_flex.align = bottom or LOT(i).self_flex.align = left
-                    or LOT(i).self_flex.align = right then
-                        case LOT(i).self_flex.align is
+                for i in Layout_Object_Tree.Iterate_Children (LOT, c) loop
+                    if LOT (i).self_flex.align = stretch or
+                       LOT (i).self_flex.align = center or
+                       LOT (i).self_flex.align = bottom or
+                       LOT (i).self_flex.align = left or
+                       LOT (i).self_flex.align = right
+                    then
+                        case LOT (i).self_flex.align is
                             when stretch =>
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
@@ -723,7 +627,7 @@ package body dui is
 
                                     when bottom_top | top_bottom =>
                                         LOT (i).x :=
-                                        (LOT_pw / 2) - (LOT (i).w / 2);
+                                           (LOT_pw / 2) - (LOT (i).w / 2);
 
                                     when others =>
                                         null;
@@ -731,7 +635,8 @@ package body dui is
                             when bottom =>
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
-                                        LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
+                                        LOT (i).y :=
+                                           LOT_ph - LOT (i).h - LOT_oy;
 
                                     when bottom_top | top_bottom =>
                                         next_y    := next_y - LOT (i).h;
@@ -739,7 +644,7 @@ package body dui is
 
                                     when others =>
                                         null;
-                            end case;
+                                end case;
                             when left =>
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
@@ -873,7 +778,6 @@ package body dui is
                     calculate_children_coordinates; -- Procedure call traverses children of current widget to calculate their (x,y) coordinates.
                     if cc > 1 then
                         calculate_buoy; -- Procedure call recalculates (x,y) coordinates of child widgets to apply buoyancy format
-                        --calculate_gap; -- Procedure call recalculates (x,y) coordinates of child widgets to apply gap size
                         calculate_align;
                     end if;
                 end;
@@ -881,16 +785,17 @@ package body dui is
         end compute_node;
 
         procedure poll_events is
-            State : constant TP_State := STM32.Board.Touch_Panel.Get_All_Touch_Points;
-            Curr_X : Natural := 0;
-            Curr_Y : Natural := 0;
-            Curr_W : Natural := 0;
+            State  : constant TP_State :=
+               STM32.Board.Touch_Panel.Get_All_Touch_Points;
+            Curr_X : Natural           := 0;
+            Curr_Y : Natural           := 0;
+            Curr_W : Natural           := 0;
         begin
             STM32.Board.Display.Hidden_Buffer (1).Set_Source
-                (HAL.Bitmap.Green);
+               (HAL.Bitmap.Green);
 
             if State'Length = 0 and event_state = idle then
-                update_render := false;
+                update_render := False;
             elsif State'Length = 1 and event_state = idle then
                 null; -- button press here
                 -- call observer button press event procedure
@@ -899,23 +804,22 @@ package body dui is
                 Curr_W := State (State'First).Weight;
                 for C in LOT.Iterate loop
                     if Layout_Object_Tree.Element (C).Is_In_Bound
-                            (Curr_X, Curr_Y)
+                          (Curr_X, Curr_Y)
                     then
                         Layout_Object_Tree.Element (C).Click;
                     end if;
                 end loop;
-                event_state := press;
-                update_render := true;
+                event_state   := press;
+                update_render := True;
             elsif State'Length = 1 and event_state = press then
                 null; -- idling in press (same press but waiting)
             elsif State'Length = 0 and event_state = press then
-                 null; -- press has been released; transition back to idle
+                -- press has been released; transition back to idle
                 -- call observer button release procedure
                 for C in LOT.Iterate loop
                     if Layout_Object_Tree.Element (C).Is_Clickable then
-                        Widget.Button.Any_Acc
-                            (Layout_Object_Tree.Element (c))
-                            .release_click;
+                        Widget.Button.Any_Acc (Layout_Object_Tree.Element (C))
+                           .release_click;
                     end if;
                 end loop;
                 event_state := idle;
@@ -923,62 +827,76 @@ package body dui is
                 event_state := resize;
                 -- set a starting point for each touch point
                 declare
-                    tx, ty : Integer := 0;
-                    ft : Float := 0.0;
+                    tx, ty   : Integer := 0;
+                    ft       : Float   := 0.0;
                     start_x1 : Natural := State (1).X;
                     start_y1 : Natural := State (1).Y;
                     start_x2 : Natural := State (2).X;
                     start_y2 : Natural := State (2).Y;
                 begin
-                    tx := Integer(start_x2) - Integer(start_x1);
-                    ty := Integer(start_y2) - Integer(start_y1);
-                    tx := tx ** 2;
-                    ty := ty ** 2;
-                    ft := Float(tx) + Float(ty);
+                    tx         := Integer (start_x2) - Integer (start_x1);
+                    ty         := Integer (start_y2) - Integer (start_y1);
+                    tx         := tx**2;
+                    ty         := ty**2;
+                    ft         := Float (tx) + Float (ty);
                     start_dist := Sqrt (ft);
-                    start_w := LOT (Layout_Object_Tree.First_Child (LOT.Root)).w;
-                    start_h := LOT (Layout_Object_Tree.First_Child (LOT.Root)).h;
+                    start_w    :=
+                       LOT (Layout_Object_Tree.First_Child (LOT.Root)).w;
+                    start_h    :=
+                       LOT (Layout_Object_Tree.First_Child (LOT.Root)).h;
                 end;
             elsif State'Length = 2 and event_state = resize then
                 declare
                     tx, ty : Integer := 0;
-                    dt : Float := 0.0;
-                    ft : Float := 0.0;
-                    x1 : Natural := State (1).X;
-                    y1 : Natural := State (1).Y;
-                    x2 : Natural := State (2).X;
-                    y2 : Natural := State (2).Y;
+                    dt     : Float   := 0.0;
+                    ft     : Float   := 0.0;
+                    x1     : Natural := State (1).X;
+                    y1     : Natural := State (1).Y;
+                    x2     : Natural := State (2).X;
+                    y2     : Natural := State (2).Y;
                 begin
-                    --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (Hal.Bitmap.Black);
-                    --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-                    --     (Area =>
-                    --         (Position => (0, 0), Width => window_width,
-                    --          Height   => window_height));
-                    tx := Integer(x2) - Integer(x1);
-                    ty := Integer(y2) - Integer(y1);
-                    tx := tx ** 2;
-                    ty := ty ** 2;
-                    ft := Float(tx) + Float(ty);
+                    tx := Integer (x2) - Integer (x1);
+                    ty := Integer (y2) - Integer (y1);
+                    tx := tx**2;
+                    ty := ty**2;
+                    ft := Float (tx) + Float (ty);
                     dt := Sqrt (ft);
                     if dt /= start_dist then
                         -- stretch and squish
-                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := Natural(Float(start_w) * (dt / start_dist));
-                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := Natural(Float(start_h) * (dt / start_dist));
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w > window_width then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
+                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w :=
+                           Natural (Float (start_w) * (dt / start_dist));
+                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h :=
+                           Natural (Float (start_h) * (dt / start_dist));
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w >
+                           window_width
+                        then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                               .w :=
+                               window_width;
                         end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h > window_height then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h >
+                           window_height
+                        then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                               .h :=
+                               window_height;
                         end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w <= 0 then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := 1;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w <=
+                           0
+                        then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                               .w :=
+                               1;
                         end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h <= 0 then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := 1;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h <=
+                           0
+                        then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                               .h :=
+                               1;
                         end if;
                     end if;
-                    --STM32.Board.Display.Update_Layer (1);
-                    update_render := true;
+                    update_render := True;
                 end;
             elsif State'Length < 2 and event_state = resize then
                 event_state := idle;
@@ -986,84 +904,24 @@ package body dui is
                 null;
             end if;
 
-            --  if State'Length > 0 then
-            --      STM32.Board.Display.Update_Layer (1, Copy_Back => True);
-            --  end if;
-            
         end poll_events;
 
-        --  Start_Time   : Time;
-        --  Elapsed_Time : Time_Span;
-
     begin
-            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
-            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
-            for i in 1 .. 2 loop
-                Layout_Object_Tree.Iterate (LOT, compute_node'Access);
-                render_node;
-            end loop;
+        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
+        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
+        for i in 1 .. 2 loop
+            Layout_Object_Tree.Iterate (LOT, compute_node'Access);
+            render_node;
+        end loop;
         loop
-            --Start_Time := Clock;
             poll_events;
-            --LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
-            --LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
             if update_render then
                 Layout_Object_Tree.Iterate (LOT, compute_node'Access);
-            --Layout_Object_Tree.Iterate (LOT, render_node'Access);
-
-            --  for C in LOT.Iterate loop
-            --  declare
-            --   widg : Widget.Any_Acc := Layout_Object_Tree.Element(c);
-            --  begin
-            --      widg.x := 0;
-            --      widg.y := 0;
-            --      widg.w := 100;
-            --      widg.h := 100;
-            --  end;
-            --  end loop;
-
                 render_node;
             end if;
 
-            -- Move Buffered layer to visible layer.
-            --  STM32.Board.Display.Update_Layer(1);
-
-            --  Layout_Object_Tree.Iterate (LOT, debug_dui'Access);
-            --  Layout_Object_Tree.Iterate (LOT, test'access);
-            
-            --  Elapsed_Time := Clock - Start_Time;
-            --  Put_Line ("Elapsed time (whole dui): "
-            --    & Duration'Image (To_Duration (Elapsed_Time))
-            --    & " seconds");
-
         end loop;
     end render;
-
-    --  procedure handle_click_event (x_Input : Natural; y_Input : Natural) is
-
-    --      procedure click_event (c : Layout_Object_Tree.Cursor) is
-    --      begin
-    --          if Layout_Object_Tree.Element (c).Is_In_Bound (x_Input, y_Input)
-    --          then
-    --              Layout_Object_Tree.Element (c).Click;
-    --          end if;
-    --      end click_event;
-
-    --  begin
-    --      Layout_Object_Tree.Iterate (LOT, click_event'Access);
-    --  end handle_click_event;
-
-    --  procedure handle_release_event is
-    --      procedure release_event (c : Layout_Object_Tree.Cursor) is
-    --      begin
-    --          if Layout_Object_Tree.Element (c).Is_Clickable then
-    --              Widget.Button.Any_Acc (Layout_Object_Tree.Element (c))
-    --                 .release_click;
-    --          end if;
-    --      end release_event;
-    --  begin
-    --      Layout_Object_Tree.Iterate (LOT, release_event'Access);
-    --  end handle_release_event;
 
 begin
 
@@ -1075,9 +933,8 @@ begin
     main_widget :=
        new Widget.Instance'
           (Controlled with id => +"main",
-           child_flex         => (dir => left_right, others => <>),
+           child_flex         => (dir => top_bottom, others => <>),
            bgd                => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);
-    --font.font_1_img := g.Load_QOI ("data/font_1.qoi");
 end dui;

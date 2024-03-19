@@ -33,12 +33,6 @@ package Widget.Text is
                     fgd           : Bitmap_Color:= Hal.Bitmap.White;
                     bgd : Bitmap_Color:= Hal.Bitmap.Black) return Widget.Any_Acc;
 
-   --  overriding
-   --  procedure Event (This : in out Instance; Evt : Event_Kind);
-
-   --  overriding 
-   --  procedure Click (This: in out Instance);
-
    overriding
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
 

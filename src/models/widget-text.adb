@@ -26,7 +26,7 @@ package body Widget.Text is
                max_height => max_height, max_width => max_width, font => font,
                overflow => overflow, fgd => fgd, bgd => parent.bgd,
                others                              => <>);
-        if parent.bgd = HAL.Bitmap.White then
+        if parent.bgd = HAL.Bitmap.White and fgd = HAL.Bitmap.White then
             Any_Acc (This).fgd := HAL.Bitmap.Gray;
         end if;
 
@@ -35,16 +35,6 @@ package body Widget.Text is
         dui.add_to_LOT (This, parent);
         return This;
     end Create;
-
-    --  overriding procedure Event (This : in out Instance; Evt : Event_Kind) is
-    --  begin
-    --      null;
-    --  end Event;
-
-    --  overriding procedure Click (This: in out Instance) is
-    --  begin
-    --      null;--Put_Line("I am a Text Widget.");
-    --  end;
 
     overriding procedure Draw
        (This : in out Instance; img : in out Bitmap_Buffer'Class)
