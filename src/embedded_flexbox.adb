@@ -41,12 +41,12 @@ procedure Embedded_Flexbox is
       Widget.Text.Create
       (id        => "Text", parent => header, text => "ExampletextExampletextExampletextExampletextExampletextExampletext", overflow => wrap,
       self_flex =>
-         (expand_w => (behavior => max), expand_h => (pixel, 30), others => <>));
+         (expand_w => (behavior => max), expand_h => (pixel, 50), others => <>));
    bt_example : Widget.Any_Acc :=
       Widget.Button.Create
       (id        => "BT", parent => header, text => "Button",
       self_flex =>
-         (expand_w => (pixel, 150), expand_h => (pixel, 30), others => <>), bgd => HAL.Bitmap.Purple);
+         (expand_w => (pixel, 150), expand_h => (pixel, 10), others => <>), bgd => HAL.Bitmap.Purple);
   im_example    : Widget.Any_Acc :=
    Widget.Image.Create
     (id         => "IM", parent => header, image => "Ada",

@@ -166,7 +166,12 @@ package body Widget.Text is
                                    Background => Bitmap_Color_To_Word(ARGB_1555, This.bgd));
 
                               pnt.x := This.x;
+                              if (pnt.y + 2 * y_font_size + line_spacing) > this.y + this.h then
+                                  exit;
+                              else 
                               pnt.y := pnt.y + y_font_size + line_spacing;
+
+                              
 
                               Bitmapped_Drawing.Draw_Char
                                   (Buffer => img,
@@ -180,6 +185,7 @@ package body Widget.Text is
                               
                             end if;
 
+                            end if;
                           end loop;
                         end;
 
