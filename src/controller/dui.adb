@@ -427,10 +427,9 @@ package body dui is
                                 if r_width = 0 then
                                     r_width := LOT (i).x;
                                 else
-                                        LOT (i).x :=
-                                           r_width - space_between_x -
-                                           LOT (i).w;
-                                        r_width   := LOT (i).x;
+                                    LOT (i).x :=
+                                       r_width - space_between_x - LOT (i).w;
+                                    r_width   := LOT (i).x;
                                 end if;
                             elsif LOT_Parent.child_flex.dir = left_right then
                                 if r_width = 0 then
@@ -454,9 +453,8 @@ package body dui is
                                 if r_height = 0 then
                                     r_height := LOT (i).h + LOT (i).y;
                                 else
-                                        LOT (i).y :=
-                                           space_between_y + r_height;
-                                        r_height  := LOT (i).h + LOT (i).y;
+                                    LOT (i).y := space_between_y + r_height;
+                                    r_height  := LOT (i).h + LOT (i).y;
                                 end if;
                             else
                                 null;
