@@ -22,7 +22,7 @@ procedure Embedded_Flexbox is
     (id         => "header", parent => dui.main_widget,
      self_flex  =>
       (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
-     child_flex => (dir => top_bottom, others => <>), bgd => HAL.Bitmap.Red);
+     child_flex => (dir => top_bottom, buoy => space_around, others => <>), bgd => HAL.Bitmap.Red);
 --    header2    : Widget.Any_Acc :=
 --     Widget.Create
 --      (id         => "header", parent => header,
@@ -46,7 +46,12 @@ procedure Embedded_Flexbox is
       Widget.Button.Create
       (id        => "BT", parent => header, text => "Button",
       self_flex =>
-         (expand_w => (pixel, 150), expand_h => (pixel, 50), others => <>), bgd => HAL.Bitmap.Purple);
+         (expand_w => (pixel, 150), expand_h => (pixel, 100), others => <>), bgd => HAL.Bitmap.Purple);
+   bt_example2 : Widget.Any_Acc :=
+      Widget.Button.Create
+      (id        => "BT", parent => header, text => "Button",
+      self_flex =>
+         (expand_w => (pixel, 150), expand_h => (pixel ,100), others => <>), bgd => HAL.Bitmap.Blue);
 --    im_example    : Widget.Any_Acc :=
 --     Widget.Image.Create
 --      (id         => "IM", parent => header, image => "Ada",
