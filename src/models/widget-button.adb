@@ -46,12 +46,6 @@ package body Widget.Button is
         return This;
     end;
 
---      overriding
---      procedure Event (This : in out Instance; Evt : Event_Kind) is
---      begin
---          Put_Line("==================== --> Button Clicked!! <-- ======================");
---      end Event;
-
     overriding 
     procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class) is
         use STM32.Board;
@@ -69,7 +63,6 @@ package body Widget.Button is
             if This.button_text /= null then
                 This.button_text.bgd := This.colors(clicking);
             end if;
-            --Put_Line("I am a button widget.");
         end if;
     end Click;
 

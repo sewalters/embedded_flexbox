@@ -34,19 +34,6 @@ package body Widget.Image is
         return This;
     end Create;
 
-    --  overriding procedure finalize (This : in out Instance) is
-    --  begin
-    --      null;
-    --      -- if this.image /= null then
-    --      --     g.free (this.image);
-    --      -- end if;
-    --  end;
-
-    --  overriding procedure Event (This : in out Instance; Evt : Event_Kind) is
-    --  begin
-    --      null;
-    --  end;
-
     overriding procedure Draw
        (This : in out Instance; img : in out Bitmap_Buffer'Class)
     is
@@ -74,10 +61,5 @@ package body Widget.Image is
         end loop;
 
     end Draw;
-
-    --  overriding procedure Click (This : in out Instance) is
-    --  begin
-    --  Put_Line("I am an image widget");
-    --  end;
 
 end Widget.Image;

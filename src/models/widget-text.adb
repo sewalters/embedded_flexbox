@@ -36,16 +36,6 @@ package body Widget.Text is
         return This;
     end Create;
 
-    --  overriding procedure Event (This : in out Instance; Evt : Event_Kind) is
-    --  begin
-    --      null;
-    --  end Event;
-
-    --  overriding procedure Click (This: in out Instance) is
-    --  begin
-    --      null;--Put_Line("I am a Text Widget.");
-    --  end;
-
     overriding procedure Draw
        (This : in out Instance; img : in out Bitmap_Buffer'Class)
     is

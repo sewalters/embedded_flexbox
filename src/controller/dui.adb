@@ -13,12 +13,7 @@ with Ada.Numerics; use Ada.Numerics;
 with Ada.Numerics.Elementary_Functions;
 use  Ada.Numerics.Elementary_Functions;
 
---with font;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
---with importer; -- Removed, still compiled.
-
---with namespaces; use namespaces;
 
 with Widget;
 with Widget.Button;
@@ -32,120 +27,9 @@ package body dui is
            (dui.Layout_Object_Tree.Find (dui.LOT, Parent), Widget);
     end add_to_LOT;
 
-    --  procedure draw_image
-    --     (target : in out g.image; img : in out g.image_access; x, y : Natural;
-    --      w, h   :        Natural)
-    --  is
-    --      it, jt : Integer;
-    --  begin
-    --      for j in img'Range (2) loop
-    --          for i in img'Range (1) loop
-    --              it := x + i;
-    --              jt := y + j;
-    --              if it <= x + w and jt <= y + h then
-    --                   (it, jt) := img (i, j);
-    --              end if;
-    --          end loop;
-    --      end loop;
-    --  exception
-    --      when others =>
-    --          Put_Line ("ij: " & it'Image & " jt: " & jt'Image);
-    --  end draw_image;
-
-    --  procedure draw_rect
-    --     (target : in out g.image; x, y : Natural; w, h : Natural; c : g.color)
-    --  is
-    --      Xb     : constant Integer := x;
-    --      Xe     : constant Integer := x + w - 1;
-    --      Yb     : constant Integer := y;
-    --      Ye     : constant Integer := y + h - 1;
-    --      Wx     : Integer          := Layout_Object_Tree.Element (LOT_Root).w;
-    --      Wy     : Integer          := Layout_Object_Tree.Element (LOT_Root).h;
-    --      ic, jc : Integer;
-    --  begin
-    --      --      Put_Line("Xb" & Natural'Image(Xb));
-    --      --      Put_Line("Xe" & Natural'Image(Xe));
-    --      --      Put_Line("Yb" & Natural'Image(Yb));
-    --      --      Put_Line("Ye" & Natural'Image(Ye));
-    --      for I in Xb .. Xe loop
-    --          for J in Yb .. Ye loop
-    --              ic := I;
-    --              jc := J;
-    --              if ((I < Wx and J < Wy) and ((I > 0) and (J > 0))) then
-    --                  target (I, J) := c;
-    --              end if;
-    --          end loop;
-    --      end loop;
-    --  exception
-    --      when others =>
-    --          Put_Line ("i: " & ic'Image & " J: " & jc'Image);
-    --  end draw_rect;
-
-    --  procedure draw_character
-    --     (c    : Character; magnification : Natural; target : in out g.image;
-    --      x, y : Natural; color : g.color)
-    --  is
-    --      x_font : constant Integer := font.get_font_char_start (c);
-    --      y_font : constant Integer := 1;
-    --      use g;
-    --  begin
-    --      for fj in font.bitmap_height_t'First .. font.bitmap_base loop
-    --          for fi in font.bitmap_width_t'First .. font.bitmap_base loop
-    --              --Put_Line (font.font_1_img (x_font + fi - 1, y_font + fj - 1)'image);
-    --              --Put_Line (g.color_val'last'image);
-    --              if font.font_1_img (x_font + fi - 1, y_font + fj - 1) = g.white
-    --              then
-    --                  for mj in 1 .. magnification loop
-    --                      for mi in 1 .. magnification loop
-    --                          target
-    --                             (x + (fi * magnification) + mi - 1,
-    --                              y + (fj * magnification) + mj - 1) :=
-    --                             color;
-    --                      end loop;
-    --                  end loop;
-    --              end if;
-    --          end loop;
-    --      end loop;
-    --  end draw_character;
-
-    --  procedure draw_text
-    --     (target : in out g.image; text : String; magnification : Natural;
-    --      x, y   :        Natural; color : g.color)
-    --  is
-    --      use g;
-    --  begin
-    --      for c in text'Range loop
-    --          declare
-    --              i : Natural :=
-    --                 x + (c - 1) * (magnification * (font.bitmap_base + 1));
-    --              j : Natural := y;
-    --          begin
-    --              draw_character (text (c), magnification, target, i, j, color);
-    --          end;
-    --      end loop;
-    --  exception
-    --      when others =>
-    --          Put_Line ("draw text problem!");
-    --  end draw_text;
-
     -- need a pass from leaf to root to compute intrinsic, inner content width and height
 
     procedure render (window_width : Natural; window_height : Natural) is
-
-        --      procedure debug_dui (c : Layout_Object_Tree.Cursor) is
-        --          id : Unbounded_String := Layout_Object_Tree.Element (c).id;
-        --          x  : Natural          := Layout_Object_Tree.Element (c).x;
-        --          y  : Natural          := Layout_Object_Tree.Element (c).y;
-        --          w  : Natural          := Layout_Object_Tree.Element (c).w;
-        --          h  : Natural          := Layout_Object_Tree.Element (c).h;
-        --      begin
-        --          Put_Line ("Widget id: " & To_String (id));
-        --          Put_Line ("x: " & Natural'Image (x));
-        --          Put_Line ("y: " & Natural'Image (y));
-        --          Put_Line ("width: " & Natural'Image (w));
-        --          Put_Line ("height: " & Natural'Image (h));
-        --          Put_Line ("");
-        --      end debug_dui;
 
         procedure render_node is
         begin
@@ -159,31 +43,12 @@ package body dui is
                 declare
                 w : Widget.Any_Acc := Layout_Object_Tree.Element (c);
                 begin
-                    --480x272
-                    --  if w.x < 0 or w.x > (480 - w.w) then
-                    --      w.x := 0;
-                    --  end if;
-                    --  if w.y < 0 or w.y > (272 - w.h) then
-                    --      w.y := 0;
-                    --  end if;
                     Layout_Object_Tree.Element (c).Draw
                        (img => STM32.Board.Display.Hidden_Buffer (1).all);
-                    --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (w.bgd);
-                    --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-                    --     (Area =>
-                    --         (Position => (w.x, w.y), Width => w.w,
-                    --          Height   => w.h));
                 end;
             end loop;
             STM32.Board.Display.Update_Layer (1);
         end render_node;
-
-        --      procedure test (c : Layout_Object_Tree.Cursor) is
-        --      begin
-        --          if Layout_Object_Tree.Element (c).all in Loadable'Class then
-        --              Loadable'Class (Layout_Object_Tree.Element (c).all).Load;
-        --          end if;
-        --      end test;
 
         procedure compute_node (c : Layout_Object_Tree.Cursor) is
             cc                 : Natural      := Natural (Layout_Object_Tree.Child_Count (c));
@@ -426,18 +291,6 @@ package body dui is
                             LOT (i).h := 0;
                         end if;
 
-                        --  if LOT_ox >= 480 then
-                        --      null;
-                        --  elsif LOT_ox + LOT(i).w + gap_c > 480 then
-                        --       --Overflow occuring, need to provide remaining width to current widget, set LOT_ox to 480.
-                        --       LOT(i).w := (LOT_pw + LOT_Parent.x) - LOT_ox;
-                        --       LOT_ox := 480;
-                        --  elsif LOT_ox + LOT(i).w + gap_c <= 480 then
-                        --      LOT_ox := LOT_ox + LOT (i).w + gap_c;
-                        --  else
-                        --      null;
-                        --  end if;
-
                     elsif child_column then
 
                         if LOT_oy < bottom_boundary then
@@ -500,18 +353,6 @@ package body dui is
                             LOT (i).w := 0;
                             LOT (i).h := 0;
                         end if;
-
-                        --  if LOT_oy > 272 then
-                        --      null;
-                        --  else
-                        --      if LOT_oy + LOT(i).h + gap_r <= 272 then
-                        --          LOT_oy := LOT_oy + LOT (i).h + gap_r;
-                        --      elsif LOT_oy + LOT(i).h + gap_r > 272 then
-                        --          --Overflow occured, provide remainder of height to current child and zero out any remaining children.
-                        --          LOT(i).h := (LOT_ph + LOT_Parent.y) - LOT_oy;
-                        --          LOT_oy := 273;
-                        --      end if;
-                        --  end if;
 
                     elsif child_depth then
                         null;
@@ -873,7 +714,6 @@ package body dui is
                     calculate_children_coordinates; -- Procedure call traverses children of current widget to calculate their (x,y) coordinates.
                     if cc > 1 then
                         calculate_buoy; -- Procedure call recalculates (x,y) coordinates of child widgets to apply buoyancy format
-                        --calculate_gap; -- Procedure call recalculates (x,y) coordinates of child widgets to apply gap size
                         calculate_align;
                     end if;
                 end;
@@ -909,7 +749,7 @@ package body dui is
             elsif State'Length = 1 and event_state = press then
                 null; -- idling in press (same press but waiting)
             elsif State'Length = 0 and event_state = press then
-                 null; -- press has been released; transition back to idle
+                -- press has been released; transition back to idle
                 -- call observer button release procedure
                 for C in LOT.Iterate loop
                     if Layout_Object_Tree.Element (C).Is_Clickable then
@@ -949,11 +789,6 @@ package body dui is
                     x2 : Natural := State (2).X;
                     y2 : Natural := State (2).Y;
                 begin
-                    --  STM32.Board.Display.Hidden_Buffer (1).Set_Source (Hal.Bitmap.Black);
-                    --  STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-                    --     (Area =>
-                    --         (Position => (0, 0), Width => window_width,
-                    --          Height   => window_height));
                     tx := Integer(x2) - Integer(x1);
                     ty := Integer(y2) - Integer(y1);
                     tx := tx ** 2;
@@ -977,7 +812,6 @@ package body dui is
                             LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := 1;
                         end if;
                     end if;
-                    --STM32.Board.Display.Update_Layer (1);
                     update_render := true;
                 end;
             elsif State'Length < 2 and event_state = resize then
@@ -985,15 +819,8 @@ package body dui is
             else
                 null;
             end if;
-
-            --  if State'Length > 0 then
-            --      STM32.Board.Display.Update_Layer (1, Copy_Back => True);
-            --  end if;
             
         end poll_events;
-
-        --  Start_Time   : Time;
-        --  Elapsed_Time : Time_Span;
 
     begin
             LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
@@ -1003,67 +830,14 @@ package body dui is
                 render_node;
             end loop;
         loop
-            --Start_Time := Clock;
             poll_events;
-            --LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
-            --LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
             if update_render then
                 Layout_Object_Tree.Iterate (LOT, compute_node'Access);
-            --Layout_Object_Tree.Iterate (LOT, render_node'Access);
-
-            --  for C in LOT.Iterate loop
-            --  declare
-            --   widg : Widget.Any_Acc := Layout_Object_Tree.Element(c);
-            --  begin
-            --      widg.x := 0;
-            --      widg.y := 0;
-            --      widg.w := 100;
-            --      widg.h := 100;
-            --  end;
-            --  end loop;
-
                 render_node;
             end if;
 
-            -- Move Buffered layer to visible layer.
-            --  STM32.Board.Display.Update_Layer(1);
-
-            --  Layout_Object_Tree.Iterate (LOT, debug_dui'Access);
-            --  Layout_Object_Tree.Iterate (LOT, test'access);
-            
-            --  Elapsed_Time := Clock - Start_Time;
-            --  Put_Line ("Elapsed time (whole dui): "
-            --    & Duration'Image (To_Duration (Elapsed_Time))
-            --    & " seconds");
-
         end loop;
     end render;
-
-    --  procedure handle_click_event (x_Input : Natural; y_Input : Natural) is
-
-    --      procedure click_event (c : Layout_Object_Tree.Cursor) is
-    --      begin
-    --          if Layout_Object_Tree.Element (c).Is_In_Bound (x_Input, y_Input)
-    --          then
-    --              Layout_Object_Tree.Element (c).Click;
-    --          end if;
-    --      end click_event;
-
-    --  begin
-    --      Layout_Object_Tree.Iterate (LOT, click_event'Access);
-    --  end handle_click_event;
-
-    --  procedure handle_release_event is
-    --      procedure release_event (c : Layout_Object_Tree.Cursor) is
-    --      begin
-    --          if Layout_Object_Tree.Element (c).Is_Clickable then
-    --              Widget.Button.Any_Acc (Layout_Object_Tree.Element (c))
-    --                 .release_click;
-    --          end if;
-    --      end release_event;
-    --  begin
-    --      Layout_Object_Tree.Iterate (LOT, release_event'Access);
-    --  end handle_release_event;
 
 begin
 
@@ -1079,5 +853,4 @@ begin
            bgd                => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);
-    --font.font_1_img := g.Load_QOI ("data/font_1.qoi");
 end dui;

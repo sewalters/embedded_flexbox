@@ -31,9 +31,6 @@ package Widget.Button is
                     max_height, max_width : Natural := Natural'Last;
                     bgd           : Bitmap_Color) return Widget.Any_Acc;
 
-   --  overriding
-   --  procedure Event (This : in out Instance; Evt : Event_Kind);
-
    overriding
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
 
