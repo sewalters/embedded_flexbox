@@ -2,13 +2,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with dui;
 with Hal.Bitmap; use Hal.Bitmap;
 with STM32.Board;
-with Widget.Text; use Widget.Text;
 
 package body Widget.Button is
 
     function Create (id            : string;
                      parent        : Widget.Any_Acc;
                      text          : string := "";
+                     overflow_text : text_overflow := truncate;
                      self_flex     : flex_t  := default_flex;
                      child_flex    : flex_t  := default_flex;
                      min_height, min_width : Natural := 0;
@@ -39,7 +39,7 @@ package body Widget.Button is
         if text /= "" then
         Any_Acc(this).button_text := 
             Widget.Text.Create
-            (id        => id & ".text", parent => this, text => text,
+            (id        => id & ".text", parent => this, text => text, overflow => overflow_text,
             self_flex =>
                 (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
         end if;

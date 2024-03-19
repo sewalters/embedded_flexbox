@@ -26,7 +26,7 @@ package body Widget.Text is
                max_height => max_height, max_width => max_width, font => font,
                overflow => overflow, fgd => fgd, bgd => parent.bgd,
                others                              => <>);
-        if parent.bgd = HAL.Bitmap.White then
+        if parent.bgd = HAL.Bitmap.White and fgd = HAL.Bitmap.White then
             Any_Acc (This).fgd := HAL.Bitmap.Gray;
         end if;
 

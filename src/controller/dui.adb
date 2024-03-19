@@ -933,7 +933,7 @@ begin
     main_widget :=
        new Widget.Instance'
           (Controlled with id => +"main",
-           child_flex         => (dir => left_right, others => <>),
+           child_flex         => (dir => top_bottom, others => <>),
            bgd                => HAL.Bitmap.Grey, others => <>);
     LOT.Append_Child (Parent => LOT_Root, New_Item => main_widget);
     LOT_Root := Layout_Object_Tree.First_Child (LOT_Root);
