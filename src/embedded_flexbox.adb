@@ -92,8 +92,9 @@ procedure Embedded_Flexbox is
    Widget.Create
     (id         => "header", parent => header3,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30), others => <>),
-     child_flex => (dir => right_left, others => <>), bgd => HAL.Bitmap.Blue);
+      (expand_w => (pixel, 30),  expand_h => (pixel , 30), others => <>),
+     child_flex => (dir => right_left,  others => <>),
+     bgd        => HAL.Bitmap.Blue);
 begin
 
   dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
