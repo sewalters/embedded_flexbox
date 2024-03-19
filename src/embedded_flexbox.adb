@@ -68,7 +68,7 @@ procedure Embedded_Flexbox is
          (expand_w => (portion, 2), expand_h => (behavior => max), others => <>), bgd => HAL.Bitmap.Blue);
   im_example    : Widget.Any_Acc :=
    Widget.Image.Create
-    (id         => "IM", parent => header4, image => "Lady_Ada",
+    (id         => "IM", parent => header4, image => "Psu_Shield",
      self_flex  =>
       (expand_w => (pixel, 128), expand_h => (pixel, 128), others => <>),
      child_flex => (dir => left_right,  others => <>),
