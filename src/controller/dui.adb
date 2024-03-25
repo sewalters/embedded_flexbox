@@ -258,20 +258,20 @@ package body dui is
                             case expand_w.behavior
                             is -- update w in row context
                                 when portion =>
-                                    LOT (i).all.Set_Width
+                                    width_pixel_left := width_pixel_left + LOT (i).all.Set_Width
                                        ((LOT_Parent.w / total_portion) *
                                         expand_w.portion);
                                 when pixel =>
-                                    LOT (i).all.Set_Width (expand_w.pixel);
+                                    width_pixel_left := width_pixel_left + LOT (i).all.Set_Width (expand_w.pixel);
                                 when percent =>
-                                    LOT (i).all.Set_Width
+                                    width_pixel_left := width_pixel_left + LOT (i).all.Set_Width
                                        (natural
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Width (content_width);
+                                    width_pixel_left := width_pixel_left+ LOT (i).all.Set_Width (content_width);
                                 when max =>
-                                    LOT (i).all.Set_Width
+                                    width_pixel_left := width_pixel_left+ LOT (i).all.Set_Width
                                        (width_pixel_left / nmbr_max);
                             end case;
                             case expand_h.behavior
@@ -279,16 +279,16 @@ package body dui is
                                 when portion =>
                                     null;
                                 when pixel =>
-                                    LOT (i).all.Set_Height (expand_h.pixel);
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height (expand_h.pixel);
                                 when percent =>
-                                    LOT (i).all.Set_Height
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height
                                        (natural
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Height (content_height);
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height (content_height);
                                 when max =>
-                                    LOT (i).all.Set_Height (LOT_Parent.h);
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height (LOT_Parent.h);
                             end case;
 
                             if (LOT_ox + LOT (i).w + gap_c) > right_boundary
@@ -323,20 +323,20 @@ package body dui is
                             case expand_h.behavior
                             is -- update h in column context
                                 when portion =>
-                                    LOT (i).all.Set_Height
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height
                                        ((LOT_Parent.h / total_portion) *
                                         expand_h.portion);
                                 when pixel =>
-                                    LOT (i).all.Set_Height (expand_h.pixel);
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height (expand_h.pixel);
                                 when percent =>
-                                    LOT (i).all.Set_Height
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height
                                        (natural
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Height (content_height);
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height (content_height);
                                 when max =>
-                                    LOT (i).all.Set_Height
+                                    height_pixel_left := height_pixel_left + LOT (i).all.Set_Height
                                        (height_pixel_left / nmbr_max);
                             end case;
                             case expand_w.behavior
@@ -344,16 +344,16 @@ package body dui is
                                 when portion =>
                                     null;
                                 when pixel =>
-                                    LOT (i).all.Set_Width (expand_w.pixel);
+                                    width_pixel_left := width_pixel_left+ LOT (i).all.Set_Width (expand_w.pixel);
                                 when percent =>
-                                    LOT (i).all.Set_Width
+                                    width_pixel_left := width_pixel_left+ LOT (i).all.Set_Width
                                        (natural
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Width (content_width);
+                                    width_pixel_left := width_pixel_left+ LOT (i).all.Set_Width (content_width);
                                 when max =>
-                                    LOT (i).all.Set_Width (LOT_Parent.w);
+                                    width_pixel_left := width_pixel_left+ LOT (i).all.Set_Width (LOT_Parent.w);
                             end case;
 
                             if (LOT_oy + LOT (i).h + gap_r) > bottom_boundary

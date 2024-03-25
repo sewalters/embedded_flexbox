@@ -24,14 +24,22 @@ package body Widget is
         return This;
     end Create;
 
-    function Is_In_Bound (This : in out Instance; x_Input : Natural; y_Input : Natural) return Boolean is
+    function Is_In_Bound
+       (This : in out Instance; x_Input : Natural; y_Input : Natural)
+        return Boolean
+    is
         returnval : Boolean;
     begin
-        returnval := ((This.x <= x_Input) and ((This.x + This.w) >= x_Input)) and ((This.y <= y_Input) and ((This.y + This.h) >= y_Input));
+        returnval :=
+           ((This.x <= x_Input) and ((This.x + This.w) >= x_Input)) and
+           ((This.y <= y_Input) and ((This.y + This.h) >= y_Input));
         return returnval;
-    end;
+    end Is_In_Bound;
 
-    procedure Set_Width (This : in out Instance; calculated_width : Natural) is
+    function Set_Width
+       (This : in out Instance; calculated_width : Natural) return Natural
+    is
+        remainder : Natural;
     begin
         if calculated_width < This.min_width then
             This.w :=
@@ -45,10 +53,14 @@ package body Widget is
             This.w :=
                calculated_width; --Else, we are in range of width and can set to given width.
         end if;
+        remainder := calculated_width - This.w;
+        return remainder;
     end Set_Width;
 
-    procedure Set_Height (This : in out Instance; calculated_height : Natural)
+    function Set_Height
+       (This : in out Instance; calculated_height : Natural) return Natural
     is
+        remainder : Natural;
     begin
         if calculated_height < This.min_height then
             This.h :=
@@ -62,13 +74,19 @@ package body Widget is
             This.h :=
                calculated_height; --Else, we are in range for our widgets height, and can set the height to be the given height.
         end if;
+        remainder := calculated_height - This.h;
+        return remainder;
     end Set_Height;
 
-    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class) is
+    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class)
+    is
         use STM32.Board;
     begin
-        img.Set_Source (this.bgd);
-        img.Fill_Rect (Area => (Position => (this.x, this.y), Width => this.w, Height => this.h));
+        img.Set_Source (This.bgd);
+        img.Fill_Rect
+           (Area =>
+               (Position => (This.x, This.y), Width => This.w,
+                Height   => This.h));
     end Draw;
 
     procedure Click (This : in out Instance) is
@@ -76,8 +94,8 @@ package body Widget is
         null;
     end Click;
 
-    function Is_Clickable(This: in Instance) return Boolean is
+    function Is_Clickable (This : in Instance) return Boolean is
     begin
-    return False;
+        return False;
     end Is_Clickable;
 end Widget;

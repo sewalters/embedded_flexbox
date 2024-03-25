@@ -86,8 +86,8 @@ package Widget is
                     bgd        : Bitmap_Color) return Widget.Any_Acc;
 
    function Is_In_Bound (This : in out Instance; x_Input: Natural; y_Input : Natural) return Boolean;
-   procedure Set_Width(This: in out Instance; calculated_width: Natural);
-   procedure Set_Height(This: in out Instance; calculated_height: Natural);
+   function Set_Width(This: in out Instance; calculated_width: Natural)return Natural;
+   function Set_Height(This: in out Instance; calculated_height: Natural)return Natural;
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
    procedure Click (This : in out Instance);
    function Is_Clickable(This: in Instance) return Boolean;
