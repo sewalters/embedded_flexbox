@@ -80,13 +80,13 @@ procedure Embedded_Flexbox is
    Widget.Create
     (id         => "header", parent => header3,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30), others => <>),
+      (expand_w => (pixel, 30), expand_h => (pixel, 30), align => right, others => <>),
      child_flex => (dir => right_left, others => <>), bgd => HAL.Bitmap.Red);
   header6      : Widget.Any_Acc :=
    Widget.Create
     (id         => "header", parent => header3,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30), others => <>),
+      (expand_w => (pixel, 30), expand_h => (pixel, 30), align => right, others => <>),
      child_flex => (dir => right_left, others => <>), bgd => HAL.Bitmap.Green);
   header7      : Widget.Any_Acc :=
    Widget.Create
