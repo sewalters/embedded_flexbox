@@ -11,6 +11,7 @@ package body Widget.Text is
         child_flex            : flex_t        := default_flex;
         min_height, min_width : Natural       := 0;
         max_height, max_width : Natural       := Natural'Last;
+        priority              : Natural       := 0;
         overflow              : text_overflow := default;
         text_spacing : gap_t := (pixel, 8);
         fgd                   : Bitmap_Color  := HAL.Bitmap.White;
@@ -24,6 +25,7 @@ package body Widget.Text is
                self_flex => self_flex, child_flex => child_flex,
                min_height => min_height, min_width => min_width,
                max_height => max_height, max_width => max_width, font => font,
+               priority => priority,
                overflow => overflow, fgd => fgd, bgd => parent.bgd,
                others                              => <>);
         if parent.bgd = HAL.Bitmap.White and fgd = HAL.Bitmap.White then

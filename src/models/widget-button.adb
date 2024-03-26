@@ -13,6 +13,7 @@ package body Widget.Button is
                      child_flex    : flex_t  := default_flex;
                      min_height, min_width : Natural := 0;
                      max_height, max_width : Natural := Natural'Last;
+                     priority      : Natural := 0;
                      bgd           : Bitmap_Color) return Widget.Any_Acc is
         this : Widget.Any_Acc;
     begin
@@ -24,6 +25,7 @@ package body Widget.Button is
                               min_width     => min_width, 
                               max_height    => max_height, 
                               max_width     => max_width,
+                              priority      => priority,
                               bgd           => bgd,
                               others        => <>);
         

@@ -53,13 +53,22 @@ procedure Embedded_Flexbox is
     (id        => "BT", parent => header, text => "Button1",
      self_flex =>
       (expand_w => (portion, 1), expand_h => (behavior => max), others => <>),
+     priority => 0,
      bgd       => HAL.Bitmap.Purple);
   bt_example2  : Widget.Any_Acc :=
    Widget.Button.Create
     (id => "BT", parent => header, text => "Button2", overflow_text => wrap,
      self_flex =>
       (expand_w => (portion, 2), expand_h => (behavior => max), others => <>),
+     priority => 0,
      bgd       => HAL.Bitmap.Blue);
+  bt_example3  : Widget.Any_Acc :=
+   Widget.Button.Create
+    (id => "BT", parent => header, text => "Button3", overflow_text => wrap,
+     self_flex =>
+      (expand_w => (portion, 1), expand_h => (behavior => max), others => <>),
+     priority => 0,
+     bgd       => HAL.Bitmap.Red);
   im_example   : Widget.Any_Acc :=
    Widget.Image.Create
     (id         => "IM", parent => header4, image => "Psu_Shield",

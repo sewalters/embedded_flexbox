@@ -28,6 +28,7 @@ package Widget.Text is
                     child_flex    : flex_t  := default_flex;
                     min_height, min_width : Natural := 0;
                     max_height, max_width : Natural := Natural'Last;
+                    priority              : Natural := 0;
                     overflow : text_overflow := default;
                     text_spacing : gap_t := (pixel, 8);
                     fgd           : Bitmap_Color:= Hal.Bitmap.White;

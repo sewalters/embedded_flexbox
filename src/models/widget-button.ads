@@ -26,11 +26,12 @@ package Widget.Button is
    function Create (id            : string;
                     parent        : Widget.Any_Acc;
                     text          : string := "";
-                     overflow_text : text_overflow := truncate;
+                    overflow_text : text_overflow := truncate;
                     self_flex     : flex_t  := default_flex;
                     child_flex    : flex_t  := default_flex;
                     min_height, min_width : Natural := 0;
                     max_height, max_width : Natural := Natural'Last;
+                    priority      : Natural := 0;
                     bgd           : Bitmap_Color) return Widget.Any_Acc;
 
    overriding
