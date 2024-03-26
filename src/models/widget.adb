@@ -66,11 +66,6 @@ package body Widget is
         end if;
     end Set_Height;
 
-    --      procedure Event (This : in out Instance; Evt : Event_Kind) is
-    --      begin
-    --          null;
-    --      end Event;
-
     procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class) is
         use STM32.Board;
     begin
@@ -80,7 +75,7 @@ package body Widget is
 
     procedure Click (This : in out Instance) is
     begin
-        null;--Ada.Text_IO.Put_Line("I am a widget");
+        null;
     end Click;
 
     function Is_Clickable(This: in Instance) return Boolean is
