@@ -22,8 +22,19 @@ package body dui is
 
     procedure add_to_LOT (Widget : Any_Acc; Parent : Any_Acc) is
     begin
-        dui.LOT.Append_Child
-           (dui.Layout_Object_Tree.Find (dui.LOT, Parent), Widget);
+        dui.LOT.Append_Child (dui.Layout_Object_Tree.Find (dui.LOT, Parent), Widget);
+        if (Widget.priority < 1) then
+            null;
+        else
+            null;
+            --for i in dui.Layout_Object_Tree.Iterate_Children(dui.LOT, dui.Layout_Object_Tree.Find (dui.LOT, Parent)) loop
+            --    if (LOT(i).priority >= LOT(i + 1).priority) then
+            --        null;
+            --    else
+            --        dui.Layout_Object_Tree.Swap(dui.LOT, LOT(i), LOT(i + 1));
+            --    end if;
+            --end loop;
+        end if;
     end add_to_LOT;
 
     --  procedure draw_image

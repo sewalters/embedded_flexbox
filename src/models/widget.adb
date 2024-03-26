@@ -7,6 +7,7 @@ package body Widget is
        (id                    : String; parent : Widget.Any_Acc;
         self_flex             : flex_t  := default_flex;
         child_flex            : flex_t  := default_flex;
+        priority              : Natural := 0;
         min_height, min_width : Natural := 0;
         max_height, max_width : Natural := Natural'Last; bgd : Bitmap_Color)
         return Widget.Any_Acc
@@ -17,6 +18,7 @@ package body Widget is
            new Instance'
               (Ada.Finalization.Controlled with id => +id,
                self_flex => self_flex, child_flex => child_flex,
+               priority => priority,
                min_height => min_height, min_width => min_width,
                max_height => max_height, max_width => max_width, bgd => bgd,
                others                              => <>);

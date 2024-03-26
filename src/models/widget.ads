@@ -68,6 +68,7 @@ package Widget is
       max_height, max_width : Natural := Natural'Last;
       self_flex  : flex_t;
       child_flex : flex_t;
+      priority   : Natural   := 0;
       bgd        : Bitmap_Color := (0, 0, 0, 0);
    end record;
    subtype Class is Instance'Class;
@@ -81,6 +82,7 @@ package Widget is
                     parent     : Widget.Any_Acc;
                     self_flex  : flex_t  := default_flex;
                     child_flex : flex_t  := default_flex;
+                    priority   : Natural := 0;
                     min_height, min_width : Natural := 0;
                     max_height, max_width : Natural := Natural'Last;
                     bgd        : Bitmap_Color) return Widget.Any_Acc;
