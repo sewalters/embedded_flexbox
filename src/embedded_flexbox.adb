@@ -17,95 +17,46 @@ with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 
 procedure Embedded_Flexbox is
 
-  header       : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => dui.main_widget,
-     self_flex  =>
-      (expand_w => (behavior => max), expand_h => (percent, 0.15),
-       others   => <>),
-     child_flex => (dir => left_right, buoy => space_around, others => <>),
-     bgd        => HAL.Bitmap.Light_Grey);
-  header2      : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => dui.main_widget,
-     self_flex  =>
-      (expand_w => (behavior => max), expand_h => (behavior => max),
-       others   => <>),
-     child_flex => (dir => left_right, others => <>),
-     bgd        => HAL.Bitmap.Dark_Blue);
-  header3      : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header2,
-     self_flex  =>
-      (expand_w => (percent, 0.2), expand_h => (behavior => max),
-       others   => <>),
-     child_flex => (dir => top_bottom, buoy => space_around, others => <>),
-     bgd        => HAL.Bitmap.Light_Grey);
-  header4      : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header2,
-     self_flex  =>
-      (expand_w => (behavior => max), expand_h => (behavior => max),
-       others   => <>),
-     child_flex => (dir => right_left, others => <>), bgd => HAL.Bitmap.White);
-  bt_example   : Widget.Any_Acc :=
-   Widget.Button.Create
-    (id        => "BT", parent => header, text => "Button1",
-     self_flex =>
-      (expand_w => (portion, 1), expand_h => (behavior => max), others => <>),
-     priority => 0,
-     bgd       => HAL.Bitmap.Purple);
-  bt_example2  : Widget.Any_Acc :=
-   Widget.Button.Create
-    (id => "BT", parent => header, text => "Button2", overflow_text => wrap,
-     self_flex =>
-      (expand_w => (portion, 2), expand_h => (behavior => max), others => <>),
-     priority => 0,
-     bgd       => HAL.Bitmap.Blue);
-  bt_example3  : Widget.Any_Acc :=
-   Widget.Button.Create
-    (id => "BT", parent => header, text => "Button3", overflow_text => wrap,
-     self_flex =>
-      (expand_w => (portion, 1), expand_h => (behavior => max), others => <>),
-     priority => 0,
-     bgd       => HAL.Bitmap.Red);
-  im_example   : Widget.Any_Acc :=
-   Widget.Image.Create
-    (id         => "IM", parent => header4, image => "Psu_Shield",
-     self_flex  =>
-      (expand_w => (pixel, 128), expand_h => (pixel, 128), others => <>),
-     child_flex => (dir => left_right, others => <>), bgd => HAL.Bitmap.Green);
-  text_example : Widget.Any_Acc :=
-   Widget.Text.Create
-    (id        => "Text", parent => header4,
-     text      =>
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-     overflow  => wrap,
-     self_flex =>
-      (expand_w => (behavior => max), expand_h => (behavior => max),
-       others   => <>),
-     fgd       => HAL.Bitmap.Black);
-  header5      : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header3,
-     self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30), align => right, others => <>),
-     child_flex => (dir => right_left, others => <>), bgd => HAL.Bitmap.Red);
-  header6      : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header3,
-     self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30), align => right, others => <>),
-     child_flex => (dir => right_left, others => <>), bgd => HAL.Bitmap.Green);
-  header7      : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "header", parent => header3,
-     self_flex  =>
-      (expand_w => (pixel, 30),  expand_h => (pixel , 30), others => <>),
-     child_flex => (dir => right_left,  others => <>),
-     bgd        => HAL.Bitmap.Blue);
+   header  : Widget.Any_Acc :=
+     Widget.Create
+       (id         => "header", parent => dui.main_widget,
+        self_flex  =>
+          (expand_w => (behavior => max), expand_h => (behavior => max),
+           others   => <>),
+        child_flex => (dir => left_right, buoy => space_around, others => <>),
+        bgd        => HAL.Bitmap.Red);
+   header2 : Widget.Any_Acc :=
+     Widget.Create
+       (id         => "header", parent => dui.main_widget,
+        self_flex  =>
+          (expand_w => (behavior => max), expand_h => (behavior => max),
+           others   => <>),
+        child_flex => (dir => left_right, buoy => space_around, others => <>),
+        priority => 10,
+        bgd        => HAL.Bitmap.Purple);
+   header3 : Widget.Any_Acc :=
+     Widget.Create
+       (id         => "header", parent => dui.main_widget,
+        self_flex  =>
+          (expand_w => (behavior => max), expand_h => (behavior => max),
+           others   => <>),
+        child_flex => (dir => left_right, buoy => space_around, others => <>),
+        priority => 5,
+        bgd        => HAL.Bitmap.Blue);
+   header4 : Widget.Any_Acc :=
+     Widget.Create
+       (id         => "header", parent => dui.main_widget,
+        self_flex  =>
+          (expand_w => (behavior => max), expand_h => (behavior => max),
+           others   => <>),
+        child_flex => (dir => left_right, buoy => space_around, others => <>),
+        bgd        => HAL.Bitmap.Black);
+   head_t1 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header, text => "1st inserted, prio 0.");
+   head_t2 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header2, text => "2nd inserted, prio 10.");
+   head_t3 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header3, text => "3rd inserted, prio 5.");
+   head_t4 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header4, text => "4th inserted, prio 0.");
 begin
 
-  dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
+   dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 
 end Embedded_Flexbox;
