@@ -17,6 +17,7 @@ package dui is
     update_render    : Boolean      := False;
     start_dist       : Float;
     start_w, start_h : Natural;
+    event_target : Widget.Any_Acc; -- When event is Drag, or Resize set target widget to this access pointer.
 
 
     procedure add_to_LOT (Widget : Any_Acc; Parent : Any_Acc);

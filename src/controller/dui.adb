@@ -9,6 +9,7 @@ with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 with HAL.Framebuffer;
 with Bitmapped_Drawing;       use Bitmapped_Drawing;
 with Ada.Numerics;            use Ada.Numerics;
+with embedded_view; use embedded_view;
 
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
@@ -97,23 +98,18 @@ package body dui is
         end event_rec;
 
         procedure render_node is
+        buffer : Bitmap_Buffer'Class := embedded_view.Get_Hidden_Buffer;
         begin
-            -- For "clearing" the screen for resizing
-            STM32.Board.Display.Hidden_Buffer (1).Set_Source
-               (HAL.Bitmap.Black);
-            STM32.Board.Display.Hidden_Buffer (1).Fill_Rect
-               (Area =>
-                   (Position => (0, 0), Width => window_width,
-                    Height   => window_height));
+            embedded_view.refresh(window_width, window_height);
             for C in LOT.Iterate loop
                 declare
                     w : Widget.Any_Acc := Layout_Object_Tree.Element (C);
                 begin
                     Layout_Object_Tree.Element (C).Draw
-                       (img => STM32.Board.Display.Hidden_Buffer (1).all);
+                       (img => buffer);
                 end;
             end loop;
-            STM32.Board.Display.Update_Layer (1);
+            embedded_view.Draw_Buffer(window_width, window_height);
         end render_node;
 
         procedure compute_node (c : Layout_Object_Tree.Cursor) is
@@ -907,11 +903,35 @@ package body dui is
                     ty         := ty**2;
                     ft         := Float (tx) + Float (ty);
                     start_dist := Sqrt (ft);
-                    start_w    :=
-                       LOT (Layout_Object_Tree.First_Child (LOT.Root)).w;
-                    start_h    :=
-                       LOT (Layout_Object_Tree.First_Child (LOT.Root)).h;
                 end;
+----------------------------------------------------------------------------------------------------------------------
+                declare
+                    first_c : Layout_Object_Tree.Cursor; -- First leaf node with one touch point in bounds.
+                begin
+                for C in Lot.Iterate loop
+                    if Layout_Object_Tree.Is_Leaf(C) then
+                        declare
+                            cur_widget : Widget.Any_Acc := Layout_Object_Tree.Element(C); -- Current widget to check.
+                        begin
+                            if cur_widget.Is_In_Bound(State(1).x, State(1).y) then
+                                first_c := C;
+                                exit; -- Early exit when widget is found.
+                            end if;
+                        end;
+                    end if;
+                end loop;
+                while Layout_Object_Tree.Is_Root(first_c) /= True loop
+                    if Layout_Object_Tree.Element(first_c).Is_In_Bound(State(2).x, State(2).y) then
+                        event_target := Layout_Object_Tree.Element(first_c);
+                        start_w    := event_target.w;
+                        start_h    := event_target.h;
+                        exit;
+                    else
+                        first_c := Layout_Object_Tree.Parent(first_c);
+                    end if;
+                end loop;
+                end;
+----------------------------------------------------------------------------------------------------------------------
             elsif State'Length = 2 and event_state = resize then
                 declare
                     tx, ty : Integer := 0;
@@ -930,37 +950,24 @@ package body dui is
                     dt := Sqrt (ft);
                     if dt /= start_dist then
                         -- stretch and squish
-                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w :=
-                           Natural (Float (start_w) * (dt / start_dist));
-                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h :=
-                           Natural (Float (start_h) * (dt / start_dist));
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w >
-                           window_width
-                        then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
-                               .w :=
-                               window_width;
+                        if Layout_Object_Tree.Is_Root(LOT.Find(event_target)) then
+                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := Natural (Float (start_w) * (dt / start_dist));
+                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := Natural (Float (start_h) * (dt / start_dist));
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w > window_width then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
                         end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h >
-                           window_height
-                        then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
-                               .h :=
-                               window_height;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h > window_height then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
                         end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w <=
-                           0
-                        then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
-                               .w :=
-                               1;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w <= 0 then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w :=1;
                         end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h <=
-                           0
-                        then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
-                               .h :=
-                               1;
+                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h <= 0  then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := 1;
+                        end if;
+                        else
+                            event_target.Set_Width(Natural (Float (start_w) * (dt / start_dist)));
+                            event_target.Set_Height(Natural (Float (start_h) * (dt / start_dist)));
                         end if;
                     end if;
                     update_render := True;
@@ -976,25 +983,25 @@ package body dui is
         timer  : Time;
         period : Time_Span;
     begin
-        --  LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
-        --  LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
-        --  for i in 1 .. 2 loop
-        --      Layout_Object_Tree.Iterate (LOT, compute_node'Access);
-        --      render_node;
-        --  end loop;
-        --  --init time_constraint : Time := Ada.Real
-        --  timer  := Ada.Real_Time.Clock;
-        --  period := Ada.Real_Time.Milliseconds (30); -- 30 fps for draw.
-        --  loop
-        --      poll_events;
+        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
+        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
+        for i in 1 .. 2 loop
+            Layout_Object_Tree.Iterate (LOT, compute_node'Access);
+            render_node;
+        end loop;
+        --init time_constraint : Time := Ada.Real
+        timer  := Ada.Real_Time.Clock;
+        period := Ada.Real_Time.Milliseconds (30); -- 30 fps for draw.
+        loop
+            poll_events;
 
-        --      if update_render then
-        --          Layout_Object_Tree.Iterate (LOT, compute_node'Access);
-        --          render_node;
-        --      end if;
-        --      timer := timer + period;
-        --      delay until timer;
-        --  end loop;
+            if update_render then
+                Layout_Object_Tree.Iterate (LOT, compute_node'Access);
+                render_node;
+            end if;
+            timer := timer + period;
+            delay until timer;
+        end loop;
         null;
     end render;
 begin
@@ -1002,7 +1009,7 @@ begin
     -- initialize STM32 Board Display
     --  STM32.Board.Display.Initialize;
     --  STM32.Board.Display.Initialize_Layer (1, HAL.Bitmap.ARGB_1555);
-    --STM32.Board.Touch_Panel.Initialize;
+    STM32.Board.Touch_Panel.Initialize;
 
     main_widget :=
        new Widget.Instance'
