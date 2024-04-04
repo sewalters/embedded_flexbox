@@ -20,7 +20,7 @@ with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 procedure Embedded_Flexbox is
    header  : Widget.Any_Acc :=
      Widget.Button.Create
-       (id         => "header", parent => dui.main_widget,
+       (id         => "header1", parent => dui.main_widget,
         self_flex  =>
           (expand_w => (behavior => max), expand_h => (behavior => max),
            others   => <>),
@@ -28,7 +28,7 @@ procedure Embedded_Flexbox is
         bgd        => HAL.Bitmap.Red);
    header2 : Widget.Any_Acc :=
      Widget.Create
-       (id         => "header", parent => dui.main_widget,
+       (id         => "header2", parent => dui.main_widget,
         self_flex  =>
           (expand_w => (behavior => max), expand_h => (behavior => max),
            others   => <>),
@@ -37,7 +37,7 @@ procedure Embedded_Flexbox is
         bgd        => HAL.Bitmap.Purple);
    header3 : Widget.Any_Acc :=
      Widget.Create
-       (id         => "header", parent => dui.main_widget,
+       (id         => "header3", parent => dui.main_widget,
         self_flex  =>
           (expand_w => (behavior => max), expand_h => (behavior => max),
            others   => <>),
@@ -46,16 +46,16 @@ procedure Embedded_Flexbox is
         bgd        => HAL.Bitmap.Blue);
    header4 : Widget.Any_Acc :=
      Widget.Create
-       (id         => "header", parent => dui.main_widget,
+       (id         => "header4", parent => dui.main_widget,
         self_flex  =>
           (expand_w => (behavior => max), expand_h => (behavior => max),
            others   => <>),
         child_flex => (dir => left_right, buoy => space_around, others => <>),
         bgd        => HAL.Bitmap.Black);
-   head_t1 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header, text => "1st inserted, prio 0.");
-   head_t2 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header2, text => "2nd inserted, prio 10.");
-   head_t3 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header3, text => "3rd inserted, prio 5.");
-   head_t4 : Widget.Any_Acc := Widget.Text.Create(id => "text", parent => header4, text => "4th inserted, prio 0.");
+   head_t1 : Widget.Any_Acc := Widget.Text.Create(id => "text1", parent => header, text => "1st inserted, prio 0.");
+   head_t2 : Widget.Any_Acc := Widget.Text.Create(id => "text2", parent => header2, text => "2nd inserted, prio 10.");
+   head_t3 : Widget.Any_Acc := Widget.Text.Create(id => "text3", parent => header3, text => "3rd inserted, prio 5.");
+   head_t4 : Widget.Any_Acc := Widget.Text.Create(id => "text4", parent => header4, text => "4th inserted, prio 0.");
 begin
 
    dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);

@@ -216,4 +216,28 @@ package body Widget.Text is
         end if;
     end Draw;
 
+   overriding
+   procedure Set_Event_Override_Width(This: in out Instance; Parent:  Widget.Any_Acc; new_width : Natural) is
+   use dui;
+        pc : Layout_Object_Tree.Cursor := LOT.Find(Parent);
+        ppc : Layout_Object_Tree.Cursor := Layout_Object_Tree.Parent(pc);
+        parent_parent : Widget.Any_Acc := LOT(ppc);
+   begin
+        Parent.Set_Event_Override_Width
+          (
+           Parent    => parent_parent,
+           new_width => new_width);
+   end;
+   overriding
+   procedure Set_Event_Override_Height(This: in out Instance; Parent:  Widget.Any_Acc; new_height : Natural) is
+   use dui;
+        pc : Layout_Object_Tree.Cursor := LOT.Find(Parent);
+        ppc : Layout_Object_Tree.Cursor := Layout_Object_Tree.Parent(pc);
+        parent_parent : Widget.Any_Acc := LOT(ppc);
+   begin
+        Parent.Set_Event_Override_Height
+          (
+           Parent    => parent_parent,
+           new_height => new_height);
+   end;
 end Widget.Text;

@@ -82,4 +82,24 @@ package body Widget is
     begin
     return False;
     end Is_Clickable;
+   procedure Set_Event_Override_Width(This: in out Instance; Parent: Widget.Any_Acc; new_width : Natural) is
+   begin
+        if new_width > Parent.w then
+            This.self_flex.expand_w := (pixel, Parent.w);
+        elsif new_width < 1 then
+            This.self_flex.expand_w := (pixel, 1);
+        else
+            This.self_flex.expand_w := (pixel, new_width);
+        end if;
+   end Set_Event_Override_Width;
+   procedure Set_Event_Override_Height(This: in out Instance;Parent: Widget.Any_Acc; new_height : Natural) is
+    begin
+        if new_height > Parent.h then
+            This.self_flex.expand_h := (pixel, Parent.h);
+        elsif new_height < 1 then
+            This.self_flex.expand_h := (pixel, 1);
+        else
+            This.self_flex.expand_h := (pixel, new_height);
+        end if;
+    end Set_Event_Override_Height;
 end Widget;

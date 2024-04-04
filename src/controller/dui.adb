@@ -950,7 +950,7 @@ package body dui is
                     dt := Sqrt (ft);
                     if dt /= start_dist then
                         -- stretch and squish
-                        if Layout_Object_Tree.Is_Root(LOT.Find(event_target)) then
+                        if Layout_Object_Tree.Is_Root(Layout_Object_Tree.Parent(LOT.Find(event_target))) then
                         LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := Natural (Float (start_w) * (dt / start_dist));
                         LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := Natural (Float (start_h) * (dt / start_dist));
                         if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w > window_width then
@@ -966,8 +966,13 @@ package body dui is
                             LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := 1;
                         end if;
                         else
-                            event_target.Set_Width(Natural (Float (start_w) * (dt / start_dist)));
-                            event_target.Set_Height(Natural (Float (start_h) * (dt / start_dist)));
+                        declare
+                            ppc : Layout_Object_Tree.Cursor := Layout_Object_Tree.Parent(LOT.Find(event_target));
+                            parent : Widget.Any_Acc := LOT(ppc);
+                        begin
+                            event_target.Set_Event_Override_Width( parent ,Natural (Float (start_w) * (dt / start_dist)));
+                            event_target.Set_Event_Override_Height( parent ,Natural (Float (start_h) * (dt / start_dist)));
+                        end;
                         end if;
                     end if;
                     update_render := True;
