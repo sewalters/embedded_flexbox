@@ -9,6 +9,7 @@ package Widget_Observer is
 
     procedure add_Widget(w: in out Widget.Any_Acc);
     procedure remove_Widget(w: in out Widget.Any_Acc);
-    procedure handle_event(x_Input : Natural; y_Input : Natural);
+    procedure button_press_event(x_Input : Natural; y_Input : Natural);
+    procedure button_release_event;
 
 end Widget_Observer;

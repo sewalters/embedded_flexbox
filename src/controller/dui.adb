@@ -832,11 +832,12 @@ package body dui is
                 Curr_Y := State (State'First).Y;
                 Curr_W := State (State'First).Weight;
                 for C in LOT.Iterate loop
-                    if Layout_Object_Tree.Element (C).Is_In_Bound
-                          (Curr_X, Curr_Y)
-                    then
-                        Layout_Object_Tree.Element (C).Click;
-                    end if;
+                    --  if Layout_Object_Tree.Element (C).Is_In_Bound
+                    --        (Curr_X, Curr_Y)
+                    --  then
+                    --      Layout_Object_Tree.Element (C).Click;
+                    --  end if;
+                    Widget_Observer.button_press_event(Curr_X, Curr_Y);
                 end loop;
                 event_state := press;
                 update_render := True;
@@ -846,10 +847,11 @@ package body dui is
                 -- press has been released; transition back to idle
                 -- call observer button release procedure
                 for C in LOT.Iterate loop
-                    if Layout_Object_Tree.Element (C).Is_Clickable then
-                        Widget.Button.Any_Acc (Layout_Object_Tree.Element (C))
-                           .release_click;
-                    end if;
+                    --  if Layout_Object_Tree.Element (C).Is_Clickable then
+                    --      Widget.Button.Any_Acc (Layout_Object_Tree.Element (C))
+                    --         .release_click;
+                    --  end if;
+                    Widget_Observer.button_release_event;
                 end loop;
                 event_state := idle;
             elsif State'Length = 2 and event_state /= resize then

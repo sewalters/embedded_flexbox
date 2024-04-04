@@ -2,6 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with dui;
 with Hal.Bitmap; use Hal.Bitmap;
 with STM32.Board;
+with Widget_Observer;
 
 package body Widget.Button is
 
@@ -37,6 +38,7 @@ package body Widget.Button is
         end if;
         
         dui.add_to_LOT (This, Parent);
+        Widget_Observer.add_Widget(This);
         
         if text /= "" then
         Any_Acc(this).button_text := 
