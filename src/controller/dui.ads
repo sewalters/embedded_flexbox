@@ -18,8 +18,8 @@ package dui is
     start_dist       : Float;
     start_w, start_h : Natural;
 
-    procedure add_to_LOT (Widget : Any_Acc; Parent : Any_Acc);
 
+    procedure add_to_LOT (Widget : Any_Acc; Parent : Any_Acc);
     type Loadable is interface;
     procedure Load (L : Loadable) is abstract;
 
