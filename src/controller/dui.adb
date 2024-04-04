@@ -10,6 +10,7 @@ with HAL.Framebuffer;
 with Bitmapped_Drawing;       use Bitmapped_Drawing;
 with Ada.Numerics;            use Ada.Numerics;
 with embedded_view; use embedded_view;
+with Event_Controller;
 
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
@@ -820,54 +821,47 @@ package body dui is
 
         --Note: Transform this into a reader of shared protected record for events.
         procedure poll_events is
-            State  : constant TP_State :=
-               STM32.Board.Touch_Panel.Get_All_Touch_Points;
+        use Event_Controller;
             Curr_X : Natural           := 0;
             Curr_Y : Natural           := 0;
-            Curr_W : Natural           := 0;
+            read_snap : Event_Snap := Event_Controller.Get;
         begin
-
-            if State'Length = 0 and event_state = idle then
+            if read_snap.S = no and event_state = idle then
                 update_render := False;
-            elsif State'Length = 1 and event_state = idle then
-                null; -- button press here
+            elsif read_snap.S = press and event_state = idle then
+                -- button press here
                 -- call observer button press event procedure
-                Curr_X := State (State'First).X;
-                Curr_Y := State (State'First).Y;
-                Curr_W := State (State'First).Weight;
+                Curr_X := read_snap.X1;
+                Curr_Y := read_snap.Y1;
                 for C in LOT.Iterate loop
-                    --  if Layout_Object_Tree.Element (C).Is_In_Bound
-                    --        (Curr_X, Curr_Y)
-                    --  then
-                    --      Layout_Object_Tree.Element (C).Click;
-                    --  end if;
                     Widget_Observer.button_press_event (Curr_X, Curr_Y);
                 end loop;
                 event_state   := press;
                 update_render := True;
-            elsif State'Length = 1 and event_state = press then
+            elsif read_snap.S = press and event_state = press then
                 null; -- idling in press (same press but waiting)
-            elsif State'Length = 0 and event_state = press then
+            elsif read_snap.S = no and event_state = press then
                 -- press has been released; transition back to idle
                 -- call observer button release procedure
                 for C in LOT.Iterate loop
-                    --  if Layout_Object_Tree.Element (C).Is_Clickable then
-                    --      Widget.Button.Any_Acc (Layout_Object_Tree.Element (C))
-                    --         .release_click;
-                    --  end if;
                     Widget_Observer.button_release_event;
                 end loop;
                 event_state := idle;
-            elsif State'Length = 2 and event_state /= resize then
+            elsif read_snap.S = resize and event_state = press then
+                for C in LOT.Iterate loop
+                    Widget_Observer.button_release_event;
+                end loop;
+                event_state := idle;          
+            elsif read_snap.S = resize and event_state /= resize then
                 event_state := resize;
                 -- set a starting point for each touch point
                 declare
                     tx, ty   : Integer := 0;
                     ft       : Float   := 0.0;
-                    start_x1 : Natural := State (1).X;
-                    start_y1 : Natural := State (1).Y;
-                    start_x2 : Natural := State (2).X;
-                    start_y2 : Natural := State (2).Y;
+                    start_x1 : Natural := read_snap.x1;
+                    start_y1 : Natural := read_snap.y1;
+                    start_x2 : Natural := read_snap.x2;
+                    start_y2 : Natural := read_snap.y2;
                 begin
                     tx         := Integer (start_x2) - Integer (start_x1);
                     ty         := Integer (start_y2) - Integer (start_y1);
@@ -885,7 +879,7 @@ package body dui is
                         declare
                             cur_widget : Widget.Any_Acc := Layout_Object_Tree.Element(C); -- Current widget to check.
                         begin
-                            if cur_widget.Is_In_Bound(State(1).x, State(1).y) then
+                            if cur_widget.Is_In_Bound(read_snap.x1, read_snap.y1) then
                                 first_c := C;
                                 exit; -- Early exit when widget is found.
                             end if;
@@ -893,7 +887,7 @@ package body dui is
                     end if;
                 end loop;
                 while Layout_Object_Tree.Is_Root(first_c) /= True loop
-                    if Layout_Object_Tree.Element(first_c).Is_In_Bound(State(2).x, State(2).y) then
+                    if Layout_Object_Tree.Element(first_c).Is_In_Bound(read_snap.x2, read_snap.y2) then
                         event_target := Layout_Object_Tree.Element(first_c);
                         start_w    := event_target.w;
                         start_h    := event_target.h;
@@ -904,15 +898,15 @@ package body dui is
                 end loop;
                 end;
 ----------------------------------------------------------------------------------------------------------------------
-            elsif State'Length = 2 and event_state = resize then
+            elsif read_snap.S = resize and event_state = resize then
                 declare
                     tx, ty : Integer := 0;
                     dt     : Float   := 0.0;
                     ft     : Float   := 0.0;
-                    x1     : Natural := State (1).X;
-                    y1     : Natural := State (1).Y;
-                    x2     : Natural := State (2).X;
-                    y2     : Natural := State (2).Y;
+                    x1     : Natural := read_snap.x1;
+                    y1     : Natural := read_snap.y1;
+                    x2     : Natural := read_snap.x2;
+                    y2     : Natural := read_snap.y2;
                 begin
                     tx := Integer (x2) - Integer (x1);
                     ty := Integer (y2) - Integer (y1);
@@ -949,7 +943,7 @@ package body dui is
                     end if;
                     update_render := True;
                 end;
-            elsif State'Length < 2 and event_state = resize then
+            elsif read_snap.S = no and event_state = resize then
                 event_state := idle;
             else
                 null;

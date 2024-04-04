@@ -28,12 +28,19 @@ package body event_handler is
                     writer_snap.y2 := 0;
                     writer_snap.S := press;
                     Event_Controller.Set(writer_snap);
+                elsif State'Length = 2 then
+                    writer_snap.x1 := State(1).x;
+                    writer_snap.y1 := State(1).y;
+                    writer_snap.x2 := State(2).x;
+                    writer_snap.y2 := State(2).y;
+                    writer_snap.S := resize;
+                    Event_Controller.Set(writer_snap);
                 else
-                    writer_snap.x1 := 0;
-                    writer_snap.y1 := 0;
-                    writer_snap.x2 := 0;
-                    writer_snap.y2 := 0;
-                    writer_snap.S := no;
+                    writer_snap.x1 := State(1).x;
+                    writer_snap.y1 := State(1).y;
+                    writer_snap.x2 := State(2).x;
+                    writer_snap.y2 := State(2).y;
+                    writer_snap.S := resize;
                     Event_Controller.Set(writer_snap);
                 end if;
                 wait_time := wait_time + period;
