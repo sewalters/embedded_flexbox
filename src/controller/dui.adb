@@ -71,32 +71,6 @@ package body dui is
     
     procedure render (window_width : Natural; window_height : Natural) is
 
-        type event_t is (no, press);
-        type event_snap is record
-            x1, x2, y1, y2 : Natural;
-            evt_t          : event_t;
-        end record;
-        protected type event_rec is
-            procedure Set_Event_Snapshot (x1, y1, x2, y2 : Natural := 0; evt_t : event_t);
-            function Get_Event_Snapshot return event_snap;
-        private
-            event_snapshot : event_snap;
-        end event_rec;
-        protected body event_rec is
-            procedure Set_Event_Snapshot (x1, y1, x2, y2 : Natural := 0; evt_t : event_t) is
-            begin
-                event_snapshot.x1    := x1;
-                event_snapshot.y1    := y1;
-                event_snapshot.x2    := x2;
-                event_snapshot.y2    := y2;
-                event_snapshot.evt_t := evt_t;
-            end Set_Event_Snapshot;
-            function Get_Event_Snapshot return event_snap is
-            begin
-                return event_snapshot;
-            end Get_Event_Snapshot;
-        end event_rec;
-
         procedure render_node is
         buffer : Bitmap_Buffer'Class := embedded_view.Get_Hidden_Buffer;
         begin
@@ -852,8 +826,6 @@ package body dui is
             Curr_Y : Natural           := 0;
             Curr_W : Natural           := 0;
         begin
-            STM32.Board.Display.Hidden_Buffer (1).Set_Source
-               (HAL.Bitmap.Green);
 
             if State'Length = 0 and event_state = idle then
                 update_render := False;

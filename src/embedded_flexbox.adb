@@ -15,7 +15,7 @@ with embedded_view; use embedded_view;
 with dui;                     use dui;
 with HAL;                     use HAL;
 with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
---with event_handler;
+with event_handler;
 
 procedure Embedded_Flexbox is
    header  : Widget.Any_Acc :=
