@@ -9,7 +9,7 @@ with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 with HAL.Framebuffer;
 with Bitmapped_Drawing;       use Bitmapped_Drawing;
 with Ada.Numerics;            use Ada.Numerics;
-with embedded_view; use embedded_view;
+with embedded_view;           use embedded_view;
 with Event_Controller;
 
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
@@ -69,22 +69,21 @@ package body dui is
     end add_to_LOT;
 
     -- need a pass from leaf to root to compute intrinsic, inner content width and height
-    
+
     procedure render (window_width : Natural; window_height : Natural) is
 
         procedure render_node is
-        buffer : Bitmap_Buffer'Class := embedded_view.Get_Hidden_Buffer;
+            buffer : Bitmap_Buffer'Class := embedded_view.Get_Hidden_Buffer;
         begin
-            embedded_view.refresh(window_width, window_height);
+            embedded_view.refresh (window_width, window_height);
             for C in LOT.Iterate loop
                 declare
                     w : Widget.Any_Acc := Layout_Object_Tree.Element (C);
                 begin
-                    Layout_Object_Tree.Element (C).Draw
-                       (img => buffer);
+                    Layout_Object_Tree.Element (C).Draw (img => buffer);
                 end;
             end loop;
-            embedded_view.Draw_Buffer(window_width, window_height);
+            embedded_view.Draw_Buffer (window_width, window_height);
         end render_node;
 
         procedure compute_node (c : Layout_Object_Tree.Cursor) is
@@ -821,9 +820,9 @@ package body dui is
 
         --Note: Transform this into a reader of shared protected record for events.
         procedure poll_events is
-        use Event_Controller;
-            Curr_X : Natural           := 0;
-            Curr_Y : Natural           := 0;
+            use Event_Controller;
+            Curr_X    : Natural    := 0;
+            Curr_Y    : Natural    := 0;
             read_snap : Event_Snap := Event_Controller.Get;
         begin
             if read_snap.S = no and event_state = idle then
@@ -833,9 +832,7 @@ package body dui is
                 -- call observer button press event procedure
                 Curr_X := read_snap.X1;
                 Curr_Y := read_snap.Y1;
-                for C in LOT.Iterate loop
                     Widget_Observer.button_press_event (Curr_X, Curr_Y);
-                end loop;
                 event_state   := press;
                 update_render := True;
             elsif read_snap.S = press and event_state = press then
@@ -843,15 +840,11 @@ package body dui is
             elsif read_snap.S = no and event_state = press then
                 -- press has been released; transition back to idle
                 -- call observer button release procedure
-                for C in LOT.Iterate loop
                     Widget_Observer.button_release_event;
-                end loop;
                 event_state := idle;
             elsif read_snap.S = resize and event_state = press then
-                for C in LOT.Iterate loop
                     Widget_Observer.button_release_event;
-                end loop;
-                event_state := idle;          
+                event_state := idle;
             elsif read_snap.S = resize and event_state /= resize then
                 event_state := resize;
                 -- set a starting point for each touch point
@@ -870,34 +863,43 @@ package body dui is
                     ft         := Float (tx) + Float (ty);
                     start_dist := Sqrt (ft);
                 end;
-----------------------------------------------------------------------------------------------------------------------
+                ----------------------------------------------------------------------------------------------------------------------
                 declare
-                    first_c : Layout_Object_Tree.Cursor; -- First leaf node with one touch point in bounds.
+                    first_c :
+                       Layout_Object_Tree
+                          .Cursor; -- First leaf node with one touch point in bounds.
                 begin
-                for C in Lot.Iterate loop
-                    if Layout_Object_Tree.Is_Leaf(C) then
-                        declare
-                            cur_widget : Widget.Any_Acc := Layout_Object_Tree.Element(C); -- Current widget to check.
-                        begin
-                            if cur_widget.Is_In_Bound(read_snap.x1, read_snap.y1) then
-                                first_c := C;
-                                exit; -- Early exit when widget is found.
-                            end if;
-                        end;
-                    end if;
-                end loop;
-                while Layout_Object_Tree.Is_Root(first_c) /= True loop
-                    if Layout_Object_Tree.Element(first_c).Is_In_Bound(read_snap.x2, read_snap.y2) then
-                        event_target := Layout_Object_Tree.Element(first_c);
-                        start_w    := event_target.w;
-                        start_h    := event_target.h;
-                        exit;
-                    else
-                        first_c := Layout_Object_Tree.Parent(first_c);
-                    end if;
-                end loop;
+                    for C in LOT.Iterate loop
+                        if Layout_Object_Tree.Is_Leaf (C) then
+                            declare
+                                cur_widget : Widget.Any_Acc :=
+                                   Layout_Object_Tree.Element
+                                      (C); -- Current widget to check.
+                            begin
+                                if cur_widget.Is_In_Bound
+                                      (read_snap.x1, read_snap.y1)
+                                then
+                                    first_c := C;
+                                    exit; -- Early exit when widget is found.
+                                end if;
+                            end;
+                        end if;
+                    end loop;
+                    while Layout_Object_Tree.Is_Root (first_c) /= True loop
+                        if Layout_Object_Tree.Element (first_c).Is_In_Bound
+                              (read_snap.x2, read_snap.y2)
+                        then
+                            event_target :=
+                               Layout_Object_Tree.Element (first_c);
+                            start_w      := event_target.w;
+                            start_h      := event_target.h;
+                            exit;
+                        else
+                            first_c := Layout_Object_Tree.Parent (first_c);
+                        end if;
+                    end loop;
                 end;
-----------------------------------------------------------------------------------------------------------------------
+                ----------------------------------------------------------------------------------------------------------------------
             elsif read_snap.S = resize and event_state = resize then
                 declare
                     tx, ty : Integer := 0;
@@ -916,34 +918,117 @@ package body dui is
                     dt := Sqrt (ft);
                     if dt /= start_dist then
                         -- stretch and squish
-                        if Layout_Object_Tree.Is_Root(Layout_Object_Tree.Parent(LOT.Find(event_target))) then
-                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := Natural (Float (start_w) * (dt / start_dist));
-                        LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := Natural (Float (start_h) * (dt / start_dist));
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w > window_width then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w := window_width;
-                        end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h > window_height then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := window_height;
-                        end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).w <= 0 then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).w :=1;
-                        end if;
-                        if LOT (Layout_Object_Tree.First_Child (LOT.Root)).h <= 0  then
-                            LOT (Layout_Object_Tree.First_Child (LOT.Root)).h := 1;
-                        end if;
+                        if Layout_Object_Tree.Is_Root
+                              (Layout_Object_Tree.Parent
+                                  (LOT.Find (event_target)))
+                        then
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                               .w :=
+                               Natural (Float (start_w) * (dt / start_dist));
+                            LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                               .h :=
+                               Natural (Float (start_h) * (dt / start_dist));
+                            if LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                  .w >
+                               window_width
+                            then
+                                LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                   .w :=
+                                   window_width;
+                            end if;
+                            if LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                  .h >
+                               window_height
+                            then
+                                LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                   .h :=
+                                   window_height;
+                            end if;
+                            if LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                  .w <=
+                               0
+                            then
+                                LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                   .w :=
+                                   1;
+                            end if;
+                            if LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                  .h <=
+                               0
+                            then
+                                LOT (Layout_Object_Tree.First_Child (LOT.Root))
+                                   .h :=
+                                   1;
+                            end if;
                         else
-                        declare
-                            ppc : Layout_Object_Tree.Cursor := Layout_Object_Tree.Parent(LOT.Find(event_target));
-                            parent : Widget.Any_Acc := LOT(ppc);
-                        begin
-                            event_target.Set_Event_Override_Width( parent ,Natural (Float (start_w) * (dt / start_dist)));
-                            event_target.Set_Event_Override_Height( parent ,Natural (Float (start_h) * (dt / start_dist)));
-                        end;
+                            declare
+                                ppc    : Layout_Object_Tree.Cursor :=
+                                   Layout_Object_Tree.Parent
+                                      (LOT.Find (event_target));
+                                parent : Widget.Any_Acc := LOT (ppc);
+                            begin
+                                event_target.Set_Event_Override_Width
+                                   (parent,
+                                    Natural
+                                       (Float (start_w) * (dt / start_dist)));
+                                event_target.Set_Event_Override_Height
+                                   (parent,
+                                    Natural
+                                       (Float (start_h) * (dt / start_dist)));
+                            end;
                         end if;
                     end if;
                     update_render := True;
                 end;
             elsif read_snap.S = no and event_state = resize then
+                event_state := idle;
+            elsif read_snap.S = drag and event_state /= drag then
+                declare
+                    current_widget : Widget.Any_Acc;
+                begin
+                    start_drag_x := read_snap.x1;
+                    start_drag_y := read_snap.y1; --Save initial coordinates for resizing on next frame.
+
+                    for C in LOT.Iterate loop
+                        current_widget := Layout_Object_Tree.Element (C);
+                        if current_widget.On_Boundary
+                              (start_drag_x, start_drag_y)
+                        then
+                            exit;
+                        end if;
+                    end loop;
+
+                    current_widget :=
+                       Layout_Object_Tree.Element
+                          (Layout_Object_Tree.Parent
+                              (LOT.Find (current_widget)));
+                    declare
+                        target : Natural := 1;
+                    begin
+                        for I in Layout_Object_Tree.Iterate_Children
+                           (LOT, LOT.Find (current_widget))
+                        loop
+                            declare
+                                this_widget : Widget.Any_Acc := Layout_Object_Tree.Element(I);
+                            begin
+                                if this_widget.On_boundary(start_drag_x, start_drag_y) and target = 1 then
+                                    drag_target_1 := this_widget;
+                                    target := 2;
+                                elsif this_widget.On_boundary(start_drag_x, start_drag_y)  then
+                                    drag_target_2 := this_widget;
+                                    exit;
+                                end if;
+                            end;
+                        end loop;
+                    end;
+                    event_state := drag;
+                end;
+            elsif read_snap.S = drag and event_state = drag then
+                null;
+                drag_target_1.bgd := Hal.Bitmap.Pink;
+                drag_target_2.bgd := Hal.Bitmap.Wheat;
+                -- Resize all who need it.
+            elsif read_snap.S /= drag and event_state = drag then
                 event_state := idle;
             else
                 null;

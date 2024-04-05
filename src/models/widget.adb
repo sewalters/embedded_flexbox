@@ -102,4 +102,21 @@ package body Widget is
             This.self_flex.expand_h := (pixel, new_height);
         end if;
     end Set_Event_Override_Height;
+
+   function On_Boundary(This: in out Instance; x: Natural; y : Natural) return Boolean is
+        forgiveness : Integer := 5; -- 5 px forgiveness for boundary.
+        int_x, int_y, int_wx, int_yh, int_xc, int_yc : Integer;
+   begin
+        int_x := Integer(This.x);
+        int_y := Integer(This.y);
+        int_wx := Integer(This.x + This.w);
+        int_yh := Integer(This.y + This.h);
+        int_xc := Integer(x);
+        int_yc := Integer(y);
+        return ( (int_xc < int_x + forgiveness) and ( int_xc > int_x - forgiveness)) or
+        ( (int_xc < int_wx + forgiveness) and ( int_xc > int_wx - forgiveness)) or
+        ( (int_yc < int_y + forgiveness) and ( int_yc > int_y - forgiveness)) or
+        ( (int_yc < int_yh + forgiveness) and ( int_yc > int_yh - forgiveness));
+
+   end On_Boundary;
 end Widget;

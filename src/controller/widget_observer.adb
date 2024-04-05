@@ -1,7 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with dui;
 with Hal.Bitmap; use Hal.Bitmap;
-with Widget.Button;
+with Widget.Button; use Widget.Button;
 
 package body Widget_Observer is
     procedure add_Widget(w: in out Widget.Any_Acc) is
@@ -26,7 +26,7 @@ package body Widget_Observer is
     begin
         for i in event_widgets'Range loop
             exit when i > curr_index;
-            if event_widgets (i).Is_In_Bound (x_Input, y_Input) then
+            if event_widgets (i).Is_In_Bound (x_Input, y_Input) and event_widgets(i).On_Boundary(x_Input, y_Input) = false then
                 event_widgets (i).Click;
             end if;
         end loop;
