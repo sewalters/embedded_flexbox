@@ -828,22 +828,87 @@ package body dui is
             if read_snap.S = no and event_state = idle then
                 update_render := False;
             elsif read_snap.S = press and event_state = idle then
-                -- button press here
-                -- call observer button press event procedure
+
                 Curr_X := read_snap.X1;
                 Curr_Y := read_snap.Y1;
-                    Widget_Observer.button_press_event (Curr_X, Curr_Y);
-                event_state   := press;
-                update_render := True;
+
+                declare
+                    is_drag        : Boolean := False;
+                    current_widget : Widget.Any_Acc;
+                begin
+
+                    for C in LOT.Iterate loop
+                        is_drag :=
+                           Layout_Object_Tree.Element (C).On_Boundary
+                              (read_snap.X1, read_snap.Y1);
+                        if is_drag then
+                            event_state    := drag;
+                            current_widget := Layout_Object_Tree.Element (C);
+                            exit;
+                        end if;
+                    end loop;
+
+                    if is_drag then
+                        --do initial drag crap here.
+                        start_drag_x := read_snap.X1;
+                        start_drag_y :=
+                           read_snap
+                              .Y1; --Save initial coordinates for resizing on next frame.
+
+                        current_widget :=
+                           Layout_Object_Tree.Element
+                              (Layout_Object_Tree.Parent
+                                  (LOT.Find (current_widget)));
+                        declare
+                            target : Natural := 1;
+                        begin
+                            drag_target_1 := null;
+                            drag_target_2 := null;
+
+                            for I in Layout_Object_Tree.Iterate_Children
+                               (LOT, LOT.Find (current_widget))
+                            loop
+                                declare
+                                    this_widget : Widget.Any_Acc :=
+                                       Layout_Object_Tree.Element (I);
+                                begin
+                                    if this_widget.On_Boundary
+                                          (start_drag_x, start_drag_y) and
+                                       target = 1
+                                    then
+                                        drag_target_1 := this_widget;
+                                        target        := 2;
+                                    elsif this_widget.On_Boundary
+                                          (start_drag_x, start_drag_y)
+                                    then
+                                        drag_target_2 := this_widget;
+                                        exit;
+                                    end if;
+                                end;
+                            end loop;
+
+                            drag_x1 := start_drag_x; --save x1,y1 here.
+                            drag_y1 := start_drag_y;
+
+                        end;
+
+                    else
+                        -- button press here
+                        -- call observer button press event procedure
+                        Widget_Observer.button_press_event (Curr_X, Curr_Y);
+                        event_state   := press;
+                        update_render := True;
+                    end if;
+                end;
             elsif read_snap.S = press and event_state = press then
                 null; -- idling in press (same press but waiting)
             elsif read_snap.S = no and event_state = press then
                 -- press has been released; transition back to idle
                 -- call observer button release procedure
-                    Widget_Observer.button_release_event;
+                Widget_Observer.button_release_event;
                 event_state := idle;
             elsif read_snap.S = resize and event_state = press then
-                    Widget_Observer.button_release_event;
+                Widget_Observer.button_release_event;
                 event_state := idle;
             elsif read_snap.S = resize and event_state /= resize then
                 event_state := resize;
@@ -851,10 +916,10 @@ package body dui is
                 declare
                     tx, ty   : Integer := 0;
                     ft       : Float   := 0.0;
-                    start_x1 : Natural := read_snap.x1;
-                    start_y1 : Natural := read_snap.y1;
-                    start_x2 : Natural := read_snap.x2;
-                    start_y2 : Natural := read_snap.y2;
+                    start_x1 : Natural := read_snap.X1;
+                    start_y1 : Natural := read_snap.Y1;
+                    start_x2 : Natural := read_snap.X2;
+                    start_y2 : Natural := read_snap.Y2;
                 begin
                     tx         := Integer (start_x2) - Integer (start_x1);
                     ty         := Integer (start_y2) - Integer (start_y1);
@@ -870,24 +935,22 @@ package body dui is
                           .Cursor; -- First leaf node with one touch point in bounds.
                 begin
                     for C in LOT.Iterate loop
-                        if Layout_Object_Tree.Is_Leaf (C) then
-                            declare
-                                cur_widget : Widget.Any_Acc :=
-                                   Layout_Object_Tree.Element
-                                      (C); -- Current widget to check.
-                            begin
-                                if cur_widget.Is_In_Bound
-                                      (read_snap.x1, read_snap.y1)
-                                then
-                                    first_c := C;
-                                    exit; -- Early exit when widget is found.
-                                end if;
-                            end;
-                        end if;
+                        declare
+                            cur_widget : Widget.Any_Acc :=
+                               Layout_Object_Tree.Element
+                                  (C); -- Current widget to check.
+                        begin
+                            if cur_widget.Is_In_Bound
+                                  (read_snap.X1, read_snap.Y1)
+                            then
+                                first_c := C;
+                            end if;
+                        end;
                     end loop;
+
                     while Layout_Object_Tree.Is_Root (first_c) /= True loop
                         if Layout_Object_Tree.Element (first_c).Is_In_Bound
-                              (read_snap.x2, read_snap.y2)
+                              (read_snap.X2, read_snap.Y2)
                         then
                             event_target :=
                                Layout_Object_Tree.Element (first_c);
@@ -898,17 +961,19 @@ package body dui is
                             first_c := Layout_Object_Tree.Parent (first_c);
                         end if;
                     end loop;
+
                 end;
+
                 ----------------------------------------------------------------------------------------------------------------------
             elsif read_snap.S = resize and event_state = resize then
                 declare
                     tx, ty : Integer := 0;
                     dt     : Float   := 0.0;
                     ft     : Float   := 0.0;
-                    x1     : Natural := read_snap.x1;
-                    y1     : Natural := read_snap.y1;
-                    x2     : Natural := read_snap.x2;
-                    y2     : Natural := read_snap.y2;
+                    x1     : Natural := read_snap.X1;
+                    y1     : Natural := read_snap.Y1;
+                    x2     : Natural := read_snap.X2;
+                    y2     : Natural := read_snap.Y2;
                 begin
                     tx := Integer (x2) - Integer (x1);
                     ty := Integer (y2) - Integer (y1);
@@ -960,6 +1025,7 @@ package body dui is
                                    .h :=
                                    1;
                             end if;
+                            null;
                         else
                             declare
                                 ppc    : Layout_Object_Tree.Cursor :=
@@ -982,53 +1048,75 @@ package body dui is
                 end;
             elsif read_snap.S = no and event_state = resize then
                 event_state := idle;
-            elsif read_snap.S = drag and event_state /= drag then
+
+            elsif read_snap.S = press and event_state = drag then
                 declare
-                    current_widget : Widget.Any_Acc;
+                    drag_x2 : Natural := read_snap.X1;
+                    drag_y2 : Natural := read_snap.Y1;
+                    drag_distance : Integer;
+                    type drag_border is (top, bottom, left, right);
+                    drag_1_border : drag_border;
+                    drag_2_border : drag_border; 
+                    parent_widget : Layout_Object_Tree.Cursor := Layout_Object_Tree.Parent(LOT.Find(drag_target_1)); 
                 begin
-                    start_drag_x := read_snap.x1;
-                    start_drag_y := read_snap.y1; --Save initial coordinates for resizing on next frame.
 
-                    for C in LOT.Iterate loop
-                        current_widget := Layout_Object_Tree.Element (C);
-                        if current_widget.On_Boundary
-                              (start_drag_x, start_drag_y)
-                        then
-                            exit;
-                        end if;
-                    end loop;
+                    if (drag_x1 > (drag_target_1.x - 5)) and (drag_x1 < (drag_target_1.x + 5)) then
+                        drag_1_border := left;
+                    elsif(drag_x1 > (drag_target_1.x + drag_target_1.w - 5)) and (drag_x1 < (drag_target_1.x + drag_target_1.w + 5)) then
+                        drag_1_border := right;
+                    elsif(drag_y1 > (drag_target_1.y - 5)) and(drag_y1 < (drag_target_1.y + 5)) then
+                        drag_1_border := top;
+                    elsif(drag_y1 > (drag_target_1.y + drag_target_1.h - 5)) and(drag_y1 < (drag_target_1.y + drag_target_1.h + 5)) then
+                        drag_1_border := bottom;
+                    else
+                        null;
+                    end if;
+                    if drag_target_2 /= null then
+                    if (drag_x1 > (drag_target_2.x - 5)) and (drag_x1 < (drag_target_2.x + 5)) then
+                        drag_2_border := left;
+                    elsif(drag_x1 > (drag_target_2.x + drag_target_2.w - 5)) and (drag_x1 < (drag_target_2.x + drag_target_2.w + 5)) then
+                        drag_2_border := right;
+                    elsif(drag_y1 > (drag_target_2.y - 5)) and(drag_y1 < (drag_target_2.y + 5)) then
+                        drag_2_border := top;
+                    elsif(drag_y1 > (drag_target_2.y + drag_target_2.h - 5)) and(drag_y1 < (drag_target_2.y + drag_target_2.h + 5)) then
+                        drag_2_border := bottom;
+                    else
+                        null;
+                    end if;
+                    end if;
 
-                    current_widget :=
-                       Layout_Object_Tree.Element
-                          (Layout_Object_Tree.Parent
-                              (LOT.Find (current_widget)));
-                    declare
-                        target : Natural := 1;
-                    begin
-                        for I in Layout_Object_Tree.Iterate_Children
-                           (LOT, LOT.Find (current_widget))
-                        loop
-                            declare
-                                this_widget : Widget.Any_Acc := Layout_Object_Tree.Element(I);
-                            begin
-                                if this_widget.On_boundary(start_drag_x, start_drag_y) and target = 1 then
-                                    drag_target_1 := this_widget;
-                                    target := 2;
-                                elsif this_widget.On_boundary(start_drag_x, start_drag_y)  then
-                                    drag_target_2 := this_widget;
-                                    exit;
+                    -- we know the borders, now we know how to "drag"
+                    --if drag_target_2 /= null then
+                        case drag_1_border is
+                            when right =>
+                                drag_distance := drag_x1 - drag_x2;
+                                if drag_distance < 0 then
+                                    drag_target_1.Set_Event_Override_Width(LOT(parent_widget), drag_target_1.w + Natural(-drag_distance));
+                                elsif drag_distance > 0 then
+                                    if drag_target_1.w - Natural(drag_distance) < 0 then
+                                    drag_target_1.w := 0;
+                                    else
+                                    drag_target_1.Set_Event_Override_Width(LOT(parent_widget),  drag_target_1.w - Natural(drag_distance));
+                                    end if;
                                 end if;
-                            end;
-                        end loop;
-                    end;
-                    event_state := drag;
-                end;
-            elsif read_snap.S = drag and event_state = drag then
-                null;
-                drag_target_1.bgd := Hal.Bitmap.Pink;
-                drag_target_2.bgd := Hal.Bitmap.Wheat;
-                -- Resize all who need it.
-            elsif read_snap.S /= drag and event_state = drag then
+                            when left =>
+                            null;
+                            when top =>
+                            null;
+                            when bottom =>
+                            null;
+                            when others =>
+                            null;
+                        end case;
+                    --else
+                        --null;
+                    --end if;
+                    
+                    drag_x1 := drag_x2;
+                    drag_y1 := drag_y2;
+                    update_render := True;
+                end;-- Resize all who need it.
+            elsif read_snap.S /= press and event_state = drag then
                 event_state := idle;
             else
                 null;

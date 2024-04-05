@@ -20,6 +20,7 @@ package dui is
     start_drag_x , start_drag_y : Natural;
     event_target : Widget.Any_Acc; -- When event is Drag, or Resize set target widget to this access pointer.
     drag_target_1, drag_target_2 : Widget.Any_Acc;
+    drag_x1, drag_y1 : Natural;
 
     procedure add_to_LOT (Widget : Any_Acc; Parent : Any_Acc);
     type Loadable is interface;
