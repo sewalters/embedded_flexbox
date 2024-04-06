@@ -21,29 +21,55 @@ procedure Test is
    Widget.Create
     (id         => "header", parent => dui.main_widget,
      self_flex  =>
-      (expand_w => (behavior=> max), expand_h => (behavior => max), others => <>),
-     child_flex => (dir => left_right, gap_c => (pixel, 10), others => <>), bgd => HAL.Bitmap.Red);
+      (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
+     child_flex => (dir => left_right, buoy => space_between, others => <>), bgd => HAL.Bitmap.Red);
+
   header2    : Widget.Any_Acc :=
    Widget.Create
     (id         => "green child", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>),
+      (expand_w => (behavior => max), expand_h => (pixel, 50), others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Green);
+
      yeahyeah    : Widget.Any_Acc :=
    Widget.Create
-    (id         => "white child", parent => header,
+    (id         => "white_child", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50),others => <>),
+      (expand_w => (behavior => content), expand_h => (behavior => content), others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.White);
+
      header3    : Widget.Any_Acc :=
    Widget.Create
     (id         => "blue child", parent => header,
      self_flex  =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50), align => right, others => <>),
+      (expand_w => (behavior => max), expand_h => (pixel, 50), others => <>),
      child_flex => (dir => left_right,  others => <>),
      bgd        => HAL.Bitmap.Blue);
+
+    child_of_child  : Widget.Any_Acc :=
+     Widget.Create
+    (id         => "child of child", parent => yeahyeah,
+     self_flex  =>
+      (expand_w => (pixel, 25), expand_h => (pixel, 50), others => <>),
+     child_flex => (dir => left_right,  others => <>),
+     bgd        => HAL.Bitmap.Cyan);
+    --    child_of_child_of_child  : Widget.Any_Acc :=
+    --   Widget.Create
+    --  (id         => "child of child", parent => child_of_child,
+    --   self_flex  =>
+    --    (expand_w => (behavior => content), expand_h => (behavior => max), others => <>),
+    --   child_flex => (dir => left_right,  others => <>),
+    --   bgd        => HAL.Bitmap.Orange);
+
+    --   child_of_child1  : Widget.Any_Acc :=
+    --   Widget.Create
+    --  (id         => "child of child", parent => child_of_child_of_child,
+    --   self_flex  =>
+    --    (expand_w => (pixel, 50), expand_h => (behavior => max), others => <>),
+    --   child_flex => (dir => left_right,  others => <>),
+    --   bgd        => HAL.Bitmap.Pink);
   --   text_example : Widget.Any_Acc :=
   --      Widget.Text.Create
   --      (id        => "Text", parent => header, text => "Example text",
