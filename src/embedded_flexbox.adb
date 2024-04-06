@@ -32,7 +32,7 @@ procedure Embedded_Flexbox is
         self_flex  =>
           (expand_w => (pixel, 200), expand_h => (pixel, 200),
            others   => <>),
-        child_flex => (dir => left_right, others => <>),
+        child_flex => (dir => top_bottom, others => <>),
         bgd        => HAL.Bitmap.Cyan);
    header2 : Widget.Any_Acc :=
      Widget.Create

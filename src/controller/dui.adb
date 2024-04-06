@@ -1121,7 +1121,7 @@ package body dui is
                             when others =>
                             null;
                         end case;
-                        
+
                     if drag_target_2 /= null then
                         --give/take away space of 2nd widget based off what we give/take from widget 1.
                         case drag_2_border is
@@ -1139,7 +1139,18 @@ package body dui is
                                 dt2_size := drag_target_2.Set_Event_Override_Width(LOT(parent_widget), new_size);
                             end if;
                             when top  | bottom =>
-                            null;
+                            if old_size - dt1_size < 0  then
+                                new_size := dt1_size - old_size; -- sub out new size
+                                if drag_target_2.h - new_size < 0 then
+                                    drag_target_2.h := 0;
+                                else
+                                    new_size := drag_target_2.h - new_size;
+                                    dt2_size :=  drag_target_2.Set_Event_Override_Height(LOT(parent_widget), new_size);
+                                end if;
+                            elsif old_size - dt1_size > 0 then
+                                new_size := drag_target_2.h + (old_size - dt1_size);
+                                dt2_size := drag_target_2.Set_Event_Override_Height(LOT(parent_widget), new_size);
+                            end if;
                             when others =>
                             null;
                         end case;
