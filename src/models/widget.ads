@@ -93,8 +93,8 @@ package Widget is
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
    procedure Click (This : in out Instance);
    function Is_Clickable(This: in Instance) return Boolean;
-   procedure Set_Event_Override_Width(This: in out Instance; Parent: Widget.Any_Acc; new_width : Natural);
-   procedure Set_Event_Override_Height(This: in out Instance; Parent: Widget.Any_Acc; new_height : Natural);
+   function Set_Event_Override_Width(This: in out Instance; Parent: Widget.Any_Acc; new_width : Natural) return Natural;
+   function Set_Event_Override_Height(This: in out Instance; Parent: Widget.Any_Acc; new_height : Natural) return Natural;
    function On_Boundary(This: in out Instance; x: Natural; y : Natural) return Boolean;
 
 private

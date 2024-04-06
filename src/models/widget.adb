@@ -82,7 +82,7 @@ package body Widget is
     begin
     return False;
     end Is_Clickable;
-   procedure Set_Event_Override_Width(This: in out Instance; Parent: Widget.Any_Acc; new_width : Natural) is
+   function Set_Event_Override_Width(This: in out Instance; Parent: Widget.Any_Acc; new_width : Natural) return Natural is
    begin
         if new_width > Parent.w then
             This.self_flex.expand_w := (pixel, Parent.w);
@@ -91,8 +91,9 @@ package body Widget is
         else
             This.self_flex.expand_w := (pixel, new_width);
         end if;
+        return This.self_flex.expand_w.pixel;
    end Set_Event_Override_Width;
-   procedure Set_Event_Override_Height(This: in out Instance;Parent: Widget.Any_Acc; new_height : Natural) is
+   function Set_Event_Override_Height(This: in out Instance;Parent: Widget.Any_Acc; new_height : Natural) return Natural is
     begin
         if new_height > Parent.h then
             This.self_flex.expand_h := (pixel, Parent.h);
@@ -101,6 +102,7 @@ package body Widget is
         else
             This.self_flex.expand_h := (pixel, new_height);
         end if;
+        return This.self_flex.expand_h.pixel;
     end Set_Event_Override_Height;
 
    function On_Boundary(This: in out Instance; x: Natural; y : Natural) return Boolean is
@@ -113,10 +115,11 @@ package body Widget is
         int_yh := Integer(This.y + This.h);
         int_xc := Integer(x);
         int_yc := Integer(y);
-        return ( (int_xc < int_x + forgiveness) and ( int_xc > int_x - forgiveness)) or
-        ( (int_xc < int_wx + forgiveness) and ( int_xc > int_wx - forgiveness)) or
-        ( (int_yc < int_y + forgiveness) and ( int_yc > int_y - forgiveness)) or
-        ( (int_yc < int_yh + forgiveness) and ( int_yc > int_yh - forgiveness));
+        return ((( (int_xc < int_x + forgiveness) and ( int_xc > int_x - forgiveness)) or
+        ( (int_xc < int_wx + forgiveness) and ( int_xc > int_wx - forgiveness)))  and ((int_yc >= int_y) and (int_yc <= int_yh))) or
+        ((( (int_yc < int_y + forgiveness) and ( int_yc > int_y - forgiveness)) or
+        ( (int_yc < int_yh + forgiveness) and ( int_yc > int_yh - forgiveness))) and ((int_xc >= int_x) and (int_xc <= int_wx)));
+
 
    end On_Boundary;
 end Widget;

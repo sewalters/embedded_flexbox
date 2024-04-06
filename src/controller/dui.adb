@@ -833,7 +833,7 @@ package body dui is
                 Curr_Y := read_snap.Y1;
 
                 declare
-                    is_drag        : Boolean := False;
+                    is_safe, is_drag        : Boolean := False;
                     current_widget : Widget.Any_Acc;
                 begin
 
@@ -847,13 +847,10 @@ package body dui is
                             exit;
                         end if;
                     end loop;
-
-                    if is_drag then
+                    if is_drag  then
                         --do initial drag crap here.
                         start_drag_x := read_snap.X1;
-                        start_drag_y :=
-                           read_snap
-                              .Y1; --Save initial coordinates for resizing on next frame.
+                        start_drag_y := read_snap.Y1; --Save initial coordinates for resizing on next frame.
 
                         current_widget :=
                            Layout_Object_Tree.Element
@@ -974,6 +971,7 @@ package body dui is
                     y1     : Natural := read_snap.Y1;
                     x2     : Natural := read_snap.X2;
                     y2     : Natural := read_snap.Y2;
+                    dummy : Natural; --needed to catch data froma function we dont need.
                 begin
                     tx := Integer (x2) - Integer (x1);
                     ty := Integer (y2) - Integer (y1);
@@ -1033,11 +1031,11 @@ package body dui is
                                       (LOT.Find (event_target));
                                 parent : Widget.Any_Acc := LOT (ppc);
                             begin
-                                event_target.Set_Event_Override_Width
+                                dummy := event_target.Set_Event_Override_Width
                                    (parent,
                                     Natural
                                        (Float (start_w) * (dt / start_dist)));
-                                event_target.Set_Event_Override_Height
+                                dummy := event_target.Set_Event_Override_Height
                                    (parent,
                                     Natural
                                        (Float (start_h) * (dt / start_dist)));
@@ -1058,6 +1056,7 @@ package body dui is
                     drag_1_border : drag_border;
                     drag_2_border : drag_border; 
                     parent_widget : Layout_Object_Tree.Cursor := Layout_Object_Tree.Parent(LOT.Find(drag_target_1)); 
+                    dt1_size, dt2_size, new_size, old_size : Natural;
                 begin
 
                     if (drag_x1 > (drag_target_1.x - 5)) and (drag_x1 < (drag_target_1.x + 5)) then
@@ -1086,32 +1085,65 @@ package body dui is
                     end if;
 
                     -- we know the borders, now we know how to "drag"
-                    --if drag_target_2 /= null then
                         case drag_1_border is
-                            when right =>
+                            when right | left =>
                                 drag_distance := drag_x1 - drag_x2;
                                 if drag_distance < 0 then
-                                    drag_target_1.Set_Event_Override_Width(LOT(parent_widget), drag_target_1.w + Natural(-drag_distance));
+                                    old_size := drag_target_1.w;
+                                    new_size := drag_target_1.w + Natural(-drag_distance);
+                                    dt1_size := drag_target_1.Set_Event_Override_Width(LOT(parent_widget), new_size);
                                 elsif drag_distance > 0 then
                                     if drag_target_1.w - Natural(drag_distance) < 0 then
-                                    drag_target_1.w := 0;
+                                        drag_target_1.w := 0;
+                                        dt1_size := 0;
                                     else
-                                    drag_target_1.Set_Event_Override_Width(LOT(parent_widget),  drag_target_1.w - Natural(drag_distance));
+                                    old_size := drag_target_1.w;
+                                    new_size := drag_target_1.w - Natural(drag_distance);
+                                    dt1_size := drag_target_1.Set_Event_Override_Width(LOT(parent_widget),  new_size);
                                     end if;
                                 end if;
-                            when left =>
+                            when top  | bottom =>
+                                drag_distance := drag_y1 - drag_y2;
+                                if drag_distance < 0 then
+                                    old_size := drag_target_1.h;
+                                    new_size := drag_target_1.h + Natural(-drag_distance);
+                                   dt1_size := drag_target_1.Set_Event_Override_Height(LOT(parent_widget), new_size);
+                                elsif drag_distance > 0 then
+                                    if drag_target_1.h - Natural(drag_distance) < 0 then
+                                    drag_target_1.h := 0;
+                                    dt1_size := 0;
+                                    else
+                                    old_size := drag_target_1.h;
+                                    new_size := drag_target_1.h - Natural(drag_distance);
+                                   dt1_size := drag_target_1.Set_Event_Override_Height(LOT(parent_widget),  new_size);
+                                    end if;
+                                end if;
+                            when others =>
                             null;
-                            when top =>
-                            null;
-                            when bottom =>
+                        end case;
+                        
+                    if drag_target_2 /= null then
+                        --give/take away space of 2nd widget based off what we give/take from widget 1.
+                        case drag_2_border is
+                            when right | left =>
+                            if old_size - dt1_size < 0  then
+                                new_size := dt1_size - old_size; -- sub out new size
+                                if drag_target_2.w - new_size < 0 then
+                                    drag_target_2.w := 0;
+                                else
+                                    new_size := drag_target_2.w - new_size;
+                                    dt2_size :=  drag_target_2.Set_Event_Override_Width(LOT(parent_widget), new_size);
+                                end if;
+                            elsif old_size - dt1_size > 0 then
+                                new_size := drag_target_2.w + (old_size - dt1_size);
+                                dt2_size := drag_target_2.Set_Event_Override_Width(LOT(parent_widget), new_size);
+                            end if;
+                            when top  | bottom =>
                             null;
                             when others =>
                             null;
                         end case;
-                    --else
-                        --null;
-                    --end if;
-                    
+                    end if;
                     drag_x1 := drag_x2;
                     drag_y1 := drag_y2;
                     update_render := True;
