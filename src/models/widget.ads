@@ -15,7 +15,7 @@ package Widget is
    type percent_t is new Float range 0.0 .. 1.0;
 
    type dir_t      is (left_right, right_left, top_bottom, bottom_top, front_back, back_front);
-   type align_t    is (top, right, bottom, left, center, stretch);
+   type align_t    is (top, right, bottom, left, center, stretch, none);
    type buoy_t     is (space_between, space_around, space_evenly, space_nothing);
    type behavior_t is (content, portion, pixel, percent, max);
 
@@ -47,7 +47,7 @@ package Widget is
 
    type flex_t is record
       dir      : dir_t    := left_right;
-      align    : align_t  := top;
+      align    : align_t  := none;
       buoy     : buoy_t   := space_nothing;
       expand_h : expand_t := (behavior => max);
       expand_w : expand_t := (behavior => max);
