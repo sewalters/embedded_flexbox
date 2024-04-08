@@ -33,7 +33,7 @@ procedure Test is
      child_flex => (dir => left_right, others => <>), bgd => HAL.Bitmap.Green);
   yeahyeah : Widget.Any_Acc :=
    Widget.Create
-    (id         => "white child", parent => header,
+    (id         => "white_child", parent => header,
      self_flex  =>
       (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>),
      child_flex => (dir => left_right, others => <>), bgd => HAL.Bitmap.White);

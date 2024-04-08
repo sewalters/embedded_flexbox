@@ -15,7 +15,7 @@ package Widget is
    type percent_t is new Float range 0.0 .. 1.0;
 
    type dir_t      is (left_right, right_left, top_bottom, bottom_top, front_back, back_front);
-   type align_t    is (top, right, bottom, left, center, stretch);
+   type align_t    is (top, right, bottom, left, center, stretch, none);
    type buoy_t     is (space_between, space_around, space_evenly, space_nothing);
    type behavior_t is (content, portion, pixel, percent, max);
 
@@ -47,7 +47,7 @@ package Widget is
 
    type flex_t is record
       dir      : dir_t    := left_right;
-      align    : align_t  := top;
+      align    : align_t  := none;
       buoy     : buoy_t   := space_nothing;
       expand_h : expand_t := (behavior => max);
       expand_w : expand_t := (behavior => max);
@@ -93,6 +93,9 @@ package Widget is
    procedure Draw (This : in out Instance; img : in out Bitmap_Buffer'Class);
    procedure Click (This : in out Instance);
    function Is_Clickable(This: in Instance) return Boolean;
+   function Set_Event_Override_Width(This: in out Instance; Parent: Widget.Any_Acc; new_width : Natural) return Natural;
+   function Set_Event_Override_Height(This: in out Instance; Parent: Widget.Any_Acc; new_height : Natural) return Natural;
+   function On_Boundary(This: in out Instance; x: Natural; y : Natural) return Boolean;
 
 private
 
