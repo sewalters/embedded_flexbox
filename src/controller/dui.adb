@@ -108,14 +108,86 @@ package body dui is
             gap_r, gap_c         : Natural;
             expand_w, expand_h   : expand_t;
             expand_wc, expand_hc : expand_t; --child behavior
-            width_pixel_left     : Natural      := LOT_Parent.w;
-            height_pixel_left    : Natural      := LOT_Parent.h;
-            total_portion        : Natural      := 0;
-            nmbr_max             : Natural      := 0;
-            content_width        : Natural      := 0;
-            content_height       : Natural      := 0;
+            width_pixel_left   : Natural      := LOT_Parent.w;
+            height_pixel_left  : Natural      := LOT_Parent.h;
+            total_portion      : Natural      := 0;
+            nmbr_max           : Natural      := 0;
 
             procedure calculate_portions is
+            procedure get_content(current: Layout_Object_Tree.Cursor) is 
+                curr_widget : Widget.Any_Acc;
+            begin
+                for c in Layout_Object_Tree.Iterate_Children(LOT, current) loop
+                    curr_widget := Layout_Object_Tree.Element(c);
+                    if child_row then
+                    case curr_widget.self_flex.expand_w.behavior is
+                        when pixel =>
+                                if curr_widget.self_flex.expand_w.pixel <= width_pixel_left then
+                                    width_pixel_left :=
+                                       width_pixel_left - curr_widget.self_flex.expand_w.pixel;
+                                else
+                                    width_pixel_left := 0;
+                                end if;
+                        when percent =>
+                                if (Natural
+                                       (Float (LOT_Parent.w) *
+                                        Float (curr_widget.self_flex.expand_w.percent))) <=
+                                   width_pixel_left
+                                then
+                                    width_pixel_left :=
+                                       width_pixel_left -
+                                       Natural
+                                          (Float (LOT_Parent.w) *
+                                           Float (curr_widget.self_flex.expand_w.percent));
+                                else
+                                    width_pixel_left := 0;
+                                end if;
+                        when portion =>
+                                total_portion :=
+                                   total_portion + curr_widget.self_flex.expand_w.portion;
+                        when max =>
+                            nmbr_max := nmbr_max + 1;
+                        when content =>
+                            get_content(c);
+                        when others =>
+                            null;
+                        end case;
+                        else 
+                        case curr_widget.self_flex.expand_h.behavior is
+                            when pixel =>
+                                if curr_widget.self_flex.expand_h.pixel <= height_pixel_left then
+                                    height_pixel_left :=
+                                       height_pixel_left - curr_widget.self_flex.expand_h.pixel;
+                                else
+                                    height_pixel_left := 0;
+                                end if;
+                        when percent =>
+                                if (Natural
+                                       (Float (LOT_Parent.h) *
+                                        Float (curr_widget.self_flex.expand_h.percent))) <=
+                                   height_pixel_left
+                                then
+                                    height_pixel_left :=
+                                       height_pixel_left -
+                                       Natural
+                                          (Float (LOT_Parent.h) *
+                                           Float (curr_widget.self_flex.expand_h.percent));
+                                else
+                                    height_pixel_left := 0;
+                                end if;
+                        when portion =>
+                                total_portion :=
+                                   total_portion + curr_widget.self_flex.expand_h.portion;
+                        when max =>
+                            nmbr_max := nmbr_max + 1;
+                        when content =>
+                            get_content(c);
+                        when others =>
+                            null;
+                        end case;
+                    end if;
+                end loop;
+            end;
             begin
                 --start by setting gap sizes for gap_c (column gaps), and gap_r (row gaps).
                 if LOT_Parent.child_flex.gap_c.behavior = pixel then
@@ -165,34 +237,7 @@ package body dui is
                                     width_pixel_left := 0;
                                 end if;
                             when content =>
-                                for j in Layout_Object_Tree.Iterate_Subtree (i)
-                                loop
-                                    if child_row then
-                                        expand_wc :=
-                                           LOT (j).self_flex.expand_w;
-                                        case expand_wc.behavior is
-                                            when portion =>
-                                                content_width :=
-                                                   content_width +
-                                                   expand_wc.portion;
-                                            when pixel =>
-                                                content_width :=
-                                                   content_width +
-                                                   expand_wc.pixel;
-                                            when percent =>
-                                                content_width :=
-                                                   content_width +
-                                                   Natural
-                                                      (Float (LOT_Parent.w) *
-                                                       Float
-                                                          (expand_wc.percent));
-                                            when content =>
-                                                null;
-                                            when max =>
-                                                null;
-                                        end case;
-                                    end if;
-                                end loop;
+                                get_content(i);
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -224,34 +269,7 @@ package body dui is
                                     height_pixel_left := 0;
                                 end if;
                             when content =>
-                                for j in Layout_Object_Tree.Iterate_Subtree (i)
-                                loop
-                                    if child_column then
-                                        expand_hc :=
-                                           LOT (j).self_flex.expand_h;
-                                        case expand_hc.behavior is
-                                            when portion =>
-                                                content_height :=
-                                                   content_height +
-                                                   expand_hc.portion;
-                                            when pixel =>
-                                                content_height :=
-                                                   content_height +
-                                                   expand_hc.pixel;
-                                            when percent =>
-                                                content_height :=
-                                                   content_height +
-                                                   Natural
-                                                      (Float (LOT_Parent.h) *
-                                                       Float
-                                                          (expand_hc.percent));
-                                            when content =>
-                                                null;
-                                            when max =>
-                                                null;
-                                        end case;
-                                    end if;
-                                end loop;
+                                get_content(i);
                             when max =>
                                 nmbr_max := nmbr_max + 1;
                         end case;
@@ -260,10 +278,79 @@ package body dui is
                     end if;
                 end loop;
             end calculate_portions;
-
+             
             procedure calculate_children_coordinates is
                 left_boundary, right_boundary, top_boundary,
                 bottom_boundary : Natural;
+                function calc_Content(current: Layout_Object_Tree.Cursor; isPrimary: Boolean) return Natural is
+                    content_size: Natural := 0;
+                    curr_widget: Widget.Any_Acc;
+                begin
+                    for c in Layout_Object_Tree.Iterate_Children(LOT, current) loop
+                        curr_widget := Layout_Object_Tree.Element(c);
+                        if child_row then
+                        case curr_widget.self_flex.expand_w.behavior is
+                            when pixel =>
+                                if isPrimary then
+                                    content_size := content_size + curr_widget.self_flex.expand_w.pixel;
+                                else
+                                    content_size := content_size + curr_widget.self_flex.expand_h.pixel;
+                                end if;
+                            when portion =>
+                                if isPrimary then
+                                    content_size := content_size + curr_widget.self_flex.expand_w.portion;
+                                else
+                                    content_size := content_size + curr_widget.self_flex.expand_h.portion;
+                                end if;
+                            when percent =>
+                                if isPrimary then
+                                    content_size := content_size + Natural(Float (LOT_Parent.w) * Float (curr_widget.self_flex.expand_w.percent));
+                                else
+                                    content_size := content_size + Natural(Float (LOT_Parent.h) * Float (curr_widget.self_flex.expand_h.percent));
+                                end if;
+                            when max =>
+                                if isPrimary then
+                                content_size := content_size + width_pixel_left / nmbr_max;
+                                else
+                                    content_size := content_size + height_pixel_left;
+                                end if;
+                            when content =>
+                                content_size := content_size + calc_content(c, isPrimary);
+                        end case;
+                        
+                        else
+                        case curr_widget.self_flex.expand_h.behavior is
+                            when pixel =>
+                                if isPrimary then
+                                    content_size := content_size + curr_widget.self_flex.expand_h.pixel;
+                                else
+                                    content_size := content_size + curr_widget.self_flex.expand_w.pixel;
+                                end if;
+                            when percent =>
+                                if isPrimary then
+                                    content_size := content_size + Natural(Float (LOT_Parent.h) * Float (curr_widget.self_flex.expand_h.percent));
+                                else
+                                    content_size := content_size + Natural(Float (LOT_Parent.w) * Float (curr_widget.self_flex.expand_w.percent));
+                                end if;
+                            when portion =>
+                                if isPrimary then
+                                    content_size := content_size + curr_widget.self_flex.expand_h.portion;
+                                else 
+                                    content_size := content_size + curr_widget.self_flex.expand_w.portion;
+                                end if;
+                            when max =>
+                            if isPrimary then
+                                content_size := content_size + height_pixel_left / nmbr_max;
+                            else
+                                content_size := content_size + width_pixel_left;
+                            end if;
+                            when content =>
+                                content_size := content_size + calc_content(c, isPrimary);
+                        end case;
+                        end if;
+                    end loop;
+                    return content_size;
+                end;
             begin
                 for i in Layout_Object_Tree.Iterate_Children (LOT, c) loop
                     if LOT_Parent.child_flex.dir = right_left then
@@ -305,7 +392,7 @@ package body dui is
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Width (content_width);
+                                    LOT (i).all.Set_Width(calc_content(i, true));
                                 when max =>
                                     LOT (i).all.Set_Width
                                        (width_pixel_left / nmbr_max);
@@ -322,7 +409,7 @@ package body dui is
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Height (content_height);
+                                    LOT (i).all.Set_Height(calc_content(i, false));
                                 when max =>
                                     LOT (i).all.Set_Height (LOT_Parent.h);
                             end case;
@@ -370,7 +457,7 @@ package body dui is
                                            (float (LOT_Parent.h) *
                                             float (expand_h.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Height (content_height);
+                                    LOT (i).all.Set_Height(calc_content(i, true));
                                 when max =>
                                     LOT (i).all.Set_Height
                                        (height_pixel_left / nmbr_max);
@@ -387,7 +474,7 @@ package body dui is
                                            (float (LOT_Parent.w) *
                                             float (expand_w.percent)));
                                 when content =>
-                                    LOT (i).all.Set_Width (content_width);
+                                    LOT (i).all.Set_Width (calc_content(i, false));
                                 when max =>
                                     LOT (i).all.Set_Width (LOT_Parent.w);
                             end case;
