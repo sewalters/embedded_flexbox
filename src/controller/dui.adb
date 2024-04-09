@@ -1045,6 +1045,7 @@ package body dui is
                             exit;
                         elsif is_button_press then
                             event_state   := press;
+                            exit;
                         end if;
                     end loop;
                     if is_drag  then
