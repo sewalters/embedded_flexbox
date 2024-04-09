@@ -1038,7 +1038,9 @@ package body dui is
                         is_drag :=
                            Layout_Object_Tree.Element (C).On_Boundary
                               (read_snap.X1, read_snap.Y1);
-                        is_button_press := Layout_Object_Tree.Element (C).Is_Clickable;
+                        if is_drag then
+                            is_button_press := Layout_Object_Tree.Element (C).Is_Clickable;
+                        end if;
                         if is_drag then
                             event_state    := drag;
                             current_widget := Layout_Object_Tree.Element (C);
