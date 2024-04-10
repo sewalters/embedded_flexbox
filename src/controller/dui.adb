@@ -1038,15 +1038,12 @@ package body dui is
                         is_drag :=
                            Layout_Object_Tree.Element (C).On_Boundary
                               (read_snap.X1, read_snap.Y1);
-                        if is_drag then
+                        if is_button_press = false then
                             is_button_press := Layout_Object_Tree.Element (C).Is_Clickable;
                         end if;
                         if is_drag then
                             event_state    := drag;
                             current_widget := Layout_Object_Tree.Element (C);
-                            exit;
-                        elsif is_button_press then
-                            event_state   := press;
                             exit;
                         end if;
                     end loop;
@@ -1096,6 +1093,7 @@ package body dui is
                         -- button press here
                         -- call observer button press event procedure
                         Widget_Observer.button_press_event (Curr_X, Curr_Y);
+                        event_state   := press;
                         update_render := True;
                     else
                         null;
