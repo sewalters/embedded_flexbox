@@ -849,7 +849,7 @@ package body dui is
                             when bottom =>
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
-                                        LOT (i).y := LOT_ph - LOT (i).h;
+                                        LOT (i).y := LOT_Parent.y + LOT_ph - LOT (i).h;
                                            --LOT_ph - LOT (i).h - LOT_oy;
 
                                     when bottom_top | top_bottom =>
@@ -882,7 +882,7 @@ package body dui is
                                     --      LOT (i).x := LOT_Parent.w - LOT (i).w;
 
                                     when top_bottom | bottom_top =>
-                                        LOT (i).x := LOT_pw - LOT (i).w;
+                                        LOT (i).x := LOT_Parent.x + LOT_pw - LOT (i).w;
                                         --LOT (i).y := LOT_Parent.h - LOT (i).h;
 
                                     when others =>
@@ -946,7 +946,7 @@ package body dui is
 
                             case LOT_Parent.child_flex.dir is
                                 when left_right | right_left =>
-                                    LOT (i).y := LOT_ph - LOT (i).h;
+                                    LOT (i).y := LOT_Parent.y + LOT_ph - LOT (i).h;
                                     --LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
 
                                 --  when bottom_top | top_bottom =>
@@ -985,7 +985,7 @@ package body dui is
                                 --      end if;
 
                                 when top_bottom | bottom_top =>
-                                    LOT (i).x := LOT_pw - LOT (i).w;
+                                    LOT (i).x := LOT_Parent.x + LOT_pw - LOT (i).w;
                                     --  LOT (i).x :=
                                     --     LOT_Parent.x + LOT_Parent.w - LOT (i).w;
                                     --  LOT (i).y := next_y;
