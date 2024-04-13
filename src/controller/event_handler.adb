@@ -19,7 +19,7 @@ package body event_handler is
                     writer_snap.y1 := 0;
                     writer_snap.x2 := 0;
                     writer_snap.y2 := 0;
-                    writer_snap.S := no;
+                    writer_snap.S := idle;
                     Event_Controller.Set(writer_snap);
                 elsif State'Length = 1 then 
                     writer_snap.x1 := State(1).x;

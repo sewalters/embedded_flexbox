@@ -1,21 +1,21 @@
-with Ada.Finalization;        use Ada.Finalization;
-with Ada.Real_Time;           use Ada.Real_Time;
-with Ada.Text_IO;             use Ada.Text_IO;
+with Ada.Finalization;                  use Ada.Finalization;
+with Ada.Real_Time;                     use Ada.Real_Time;
+with Ada.Text_IO;                       use Ada.Text_IO;
+with Ada.Numerics;                      use Ada.Numerics;
+with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
+with Ada.Strings.Unbounded;             use Ada.Strings.Unbounded;
+with Ada.Containers.Multiway_Trees;
+
 with STM32.Board;             use STM32.Board;
 with HAL.Bitmap;              use HAL.Bitmap;
 with HAL.Touch_Panel;         use HAL.Touch_Panel;
-with BMP_Fonts;
-with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 with HAL.Framebuffer;
+with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
 with Bitmapped_Drawing;       use Bitmapped_Drawing;
-with Ada.Numerics;            use Ada.Numerics;
+with BMP_Fonts;
+
 with embedded_view;           use embedded_view;
 with Event_Controller;
-
-with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
-
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Containers.Multiway_Trees;
 
 with Widget;
 with Widget.Button;
@@ -444,7 +444,6 @@ package body dui is
                     expand_w := LOT (i).self_flex.expand_w;
                     expand_h := LOT (i).self_flex.expand_h;
 
-                    -- Dom approach, take the time to directly allocate boundaries.
                     left_boundary   := LOT_Parent.x;
                     right_boundary  := LOT_Parent.x + LOT_Parent.w;
                     top_boundary    := LOT_Parent.y;
@@ -836,13 +835,9 @@ package body dui is
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
                                         LOT (i).y := LOT_Parent.y;
-                                           --LOT_ph - LOT (i).h - LOT_oy;
 
                                     when bottom_top | top_bottom =>
                                         LOT (i).self_flex.align := none;
-                                    --      next_y    := next_y - LOT (i).h;
-                                    --      LOT (i).y := next_y;
-
                                     when others =>
                                         null;
                                 end case;
@@ -850,12 +845,9 @@ package body dui is
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
                                         LOT (i).y := LOT_Parent.y + LOT_ph - LOT (i).h;
-                                           --LOT_ph - LOT (i).h - LOT_oy;
 
                                     when bottom_top | top_bottom =>
                                         LOT (i).self_flex.align := none;
-                                    --      next_y    := next_y - LOT (i).h;
-                                    --      LOT (i).y := next_y;
 
                                     when others =>
                                         null;
@@ -864,13 +856,9 @@ package body dui is
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
                                         LOT (i).self_flex.align := none;
-                                    --      LOT (i).x := next_x;
-                                    --      next_x    := next_x + LOT (i).w;
 
                                     when top_bottom | bottom_top =>
                                         LOT (i).x := LOT_Parent.x;
-                                        --  LOT (i).y := next_y;
-                                        --  next_y    := next_y + LOT (i).h;
 
                                     when others =>
                                         null;
@@ -879,11 +867,9 @@ package body dui is
                                 case LOT_Parent.child_flex.dir is
                                     when left_right | right_left =>
                                         LOT (i).self_flex.align := none;
-                                    --      LOT (i).x := LOT_Parent.w - LOT (i).w;
 
                                     when top_bottom | bottom_top =>
                                         LOT (i).x := LOT_Parent.x + LOT_pw - LOT (i).w;
-                                        --LOT (i).y := LOT_Parent.h - LOT (i).h;
 
                                     when others =>
                                         null;
@@ -893,7 +879,7 @@ package body dui is
                         end case;
                     end if;
                 end loop;
------------------------------------------------------------------------------
+
                 align_wh := LOT_Parent.child_flex.align;
                 for i in Layout_Object_Tree.Iterate_Children (LOT, c) loop
                 if LOT (i).self_flex.align = none then
@@ -931,11 +917,6 @@ package body dui is
                             case LOT_Parent.child_flex.dir is
                                 when left_right | right_left =>
                                     LOT (i).y := LOT_Parent.y;
-                                    --LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
-
-                                --  when bottom_top | top_bottom =>
-                                --      next_y    := next_y - LOT (i).h;
-                                --      LOT (i).y := next_y;
 
                                 when others =>
                                     null;
@@ -947,11 +928,6 @@ package body dui is
                             case LOT_Parent.child_flex.dir is
                                 when left_right | right_left =>
                                     LOT (i).y := LOT_Parent.y + LOT_ph - LOT (i).h;
-                                    --LOT (i).y := LOT_ph - LOT (i).h - LOT_oy;
-
-                                --  when bottom_top | top_bottom =>
-                                --      next_y    := next_y - LOT (i).h;
-                                --      LOT (i).y := next_y;
 
                                 when others =>
                                     null;
@@ -960,14 +936,8 @@ package body dui is
                     when left =>
 
                             case LOT_Parent.child_flex.dir is
-                                --  when left_right | right_left =>
-                                --      LOT (i).x := next_x;
-                                --      next_x    := next_x + LOT (i).w;
-
                                 when top_bottom | bottom_top =>
                                     LOT (i).x := LOT_Parent.x;
-                                    --  LOT (i).y := next_y;
-                                    --  next_y    := next_y + LOT (i).h;
 
                                 when others =>
                                     null;
@@ -976,20 +946,8 @@ package body dui is
                     when right =>
                         next_x := LOT_Parent.x + LOT_Parent.w;
                             case LOT_Parent.child_flex.dir is
-                                --  when left_right | right_left =>
-                                --      next_x := next_x - LOT (i).w;
-
-                                --      if next_x >= LOT_Parent.x then
-                                --          LOT (i).x := next_x;
-
-                                --      end if;
-
                                 when top_bottom | bottom_top =>
                                     LOT (i).x := LOT_Parent.x + LOT_pw - LOT (i).w;
-                                    --  LOT (i).x :=
-                                    --     LOT_Parent.x + LOT_Parent.w - LOT (i).w;
-                                    --  LOT (i).y := next_y;
-                                    --  next_y    := next_y + LOT (i).h;
 
                                 when others =>
                                     null;
@@ -1022,7 +980,7 @@ package body dui is
             Curr_Y    : Natural    := 0;
             read_snap : Event_Snap := Event_Controller.Get;
         begin
-            if read_snap.S = no and event_state = idle then
+            if read_snap.S = idle and event_state = idle then
                 update_render := False;
             elsif read_snap.S = press and event_state = idle then
 
@@ -1048,7 +1006,6 @@ package body dui is
                         end if;
                     end loop;
                     if is_drag  then
-                        --do initial drag crap here.
                         start_drag_x := read_snap.X1;
                         start_drag_y := read_snap.Y1; --Save initial coordinates for resizing on next frame.
 
@@ -1090,9 +1047,7 @@ package body dui is
                         end;
 
                     elsif is_button_press then
-                        -- button press here
-                        -- call observer button press event procedure
-                        Widget_Observer.button_press_event (Curr_X, Curr_Y);
+                        Widget_Observer.button_press_event (Curr_X, Curr_Y); -- button is pressed here
                         event_state   := press;
                         update_render := True;
                     else
@@ -1101,14 +1056,13 @@ package body dui is
                 end;
             elsif read_snap.S = press and event_state = press then
                 null; -- idling in press (same press but waiting)
-            elsif read_snap.S = no and event_state = press then
-                -- press has been released; transition back to idle
-                -- call observer button release procedure
-                Widget_Observer.button_release_event;
+            elsif read_snap.S = idle and event_state = press then
+                Widget_Observer.button_release_event; -- press has been released; transition back to idle
                 event_state := idle;
             elsif read_snap.S = resize and event_state = press then
                 Widget_Observer.button_release_event;
                 event_state := idle;
+            
             elsif read_snap.S = resize and event_state /= resize then
                 event_state := resize;
                 -- set a starting point for each touch point
@@ -1127,7 +1081,7 @@ package body dui is
                     ft         := Float (tx) + Float (ty);
                     start_dist := Sqrt (ft);
                 end;
-                ----------------------------------------------------------------------------------------------------------------------
+
                 declare
                     first_c :
                        Layout_Object_Tree
@@ -1162,8 +1116,6 @@ package body dui is
                     end loop;
 
                 end;
-
-                ----------------------------------------------------------------------------------------------------------------------
             elsif read_snap.S = resize and event_state = resize then
                 declare
                     tx, ty : Integer := 0;
@@ -1182,7 +1134,6 @@ package body dui is
                     ft := Float (tx) + Float (ty);
                     dt := Sqrt (ft);
                     if dt /= start_dist then
-                        -- stretch and squish
                         if Layout_Object_Tree.Is_Root
                               (Layout_Object_Tree.Parent
                                   (LOT.Find (event_target)))
@@ -1246,7 +1197,7 @@ package body dui is
                     end if;
                     update_render := True;
                 end;
-            elsif read_snap.S = no and event_state = resize then
+            elsif read_snap.S = idle and event_state = resize then
                 event_state := idle;
 
             elsif read_snap.S = press and event_state = drag then
@@ -1294,7 +1245,6 @@ package body dui is
                         end if;
                     end if;
 
-                    -- we know the borders, now we know how to "drag"
                         case drag_1_border is
                             when right | left =>
                                 drag_distance := drag_x1 - drag_x2;
@@ -1333,7 +1283,7 @@ package body dui is
                         end case;
 
                     if drag_target_2 /= null then
-                        --give/take away space of 2nd widget based off what we give/take from widget 1.
+                        -- give/take away space of 2nd widget based off what we give/take from widget 1.
                         case drag_2_border is
                             when right | left =>
                             if old_size - dt1_size < 0  then
@@ -1368,7 +1318,7 @@ package body dui is
                     drag_x1 := drag_x2;
                     drag_y1 := drag_y2;
                     update_render := True;
-                end;-- Resize all who need it.
+                end; -- Resize all who need it.
             elsif read_snap.S /= press and event_state = drag then
                 event_state := idle;
             else
@@ -1386,7 +1336,7 @@ package body dui is
             Layout_Object_Tree.Iterate (LOT, compute_node'Access);
             render_node;
         end loop;
-        --init time_constraint : Time := Ada.Real
+
         timer  := Ada.Real_Time.Clock;
         period := Ada.Real_Time.Milliseconds (30); -- 30 fps for draw.
         loop
@@ -1402,11 +1352,6 @@ package body dui is
         null;
     end render;
 begin
-
-    -- initialize STM32 Board Display
-    --  STM32.Board.Display.Initialize;
-    --  STM32.Board.Display.Initialize_Layer (1, HAL.Bitmap.ARGB_1555);
-    STM32.Board.Touch_Panel.Initialize;
 
     main_widget :=
        new Widget.Instance'

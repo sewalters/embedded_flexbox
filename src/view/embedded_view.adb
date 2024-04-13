@@ -23,4 +23,5 @@ package body embedded_view is
 begin
     STM32.Board.Display.Initialize;
     STM32.Board.Display.Initialize_Layer (1, HAL.Bitmap.ARGB_1555);
+    STM32.Board.Touch_Panel.Initialize;
 end embedded_view;
