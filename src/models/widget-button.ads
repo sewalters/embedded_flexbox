@@ -1,6 +1,7 @@
 with Ada.Strings.Unbounded;
 with Hal.Bitmap; use Hal.Bitmap;
 with Widget.Text; use Widget.Text;
+with BMP_Fonts; use BMP_Fonts;
 
 package Widget.Button is
 
@@ -15,7 +16,7 @@ package Widget.Button is
       colors : state_colors := (idle     => HAL.Bitmap.Gray,
                                 hover    => HAL.Bitmap.Light_Grey,
                                 clicking => HAL.Bitmap.White);
-      button_text  : Any_Acc;
+      button_text  : Widget.Text.Any_Acc;
    end record;
    
    subtype Class is Instance'Class;
@@ -27,6 +28,7 @@ package Widget.Button is
                     parent        : Widget.Any_Acc;
                     text          : string := "";
                     overflow_text : text_overflow := truncate;
+                    font : BMP_Font := Font12x12;
                     self_flex     : flex_t  := default_flex;
                     child_flex    : flex_t  := default_flex;
                     min_height, min_width : Natural := 0;
