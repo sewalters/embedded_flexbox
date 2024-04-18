@@ -32,32 +32,12 @@ bg1 : Widget.Any_Acc :=
       (expand_w => (behavior => max), expand_h => (behavior => max),
        others   => <>),
      child_flex =>
-      (dir => bottom_top, others => <>),
-     bgd        => HAL.Bitmap.Red);
-
-     child : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "child", parent => ch1_bg1,
-     self_flex  =>
-      (expand_w => (behavior => max), expand_h => (pixel, 50),
-       others   => <>),
-     child_flex =>
       (dir => left_right, gap_c => (pixel, 15), align => bottom, others => <>),
-     bgd        => HAL.Bitmap.Red);
-
-     child2 : Widget.Any_Acc :=
-   Widget.Create
-    (id         => "child", parent => ch1_bg1,
-     self_flex  =>
-      (expand_w => (behavior => max), expand_h => (pixel, 50),
-       others   => <>),
-     child_flex =>
-      (dir => left_right, gap_c => (pixel, 15), align => center, others => <>),
-     bgd        => HAL.Bitmap.Red);
+     bgd        => HAL.Bitmap.Grey);
 
      child_of_red1 : Widget.Any_Acc :=
    Widget.Create
-    (id         => "child_of_red1", parent => child,
+    (id         => "child_of_red1", parent => ch1_bg1,
      self_flex  =>
       (expand_w => (pixel, 30), expand_h => (pixel, 30),
        others   => <>),
@@ -67,7 +47,7 @@ bg1 : Widget.Any_Acc :=
 
      child_of_red2 : Widget.Any_Acc :=
    Widget.Create
-    (id         => "child_of_red2", parent => child,
+    (id         => "child_of_red2", parent => ch1_bg1,
      self_flex  =>
       (expand_w => (pixel, 30), expand_h => (pixel, 30),
        others   => <>),
@@ -77,7 +57,7 @@ bg1 : Widget.Any_Acc :=
 
      child_of_red3 : Widget.Any_Acc :=
    Widget.Create
-    (id         => "child_of_red3", parent => child,
+    (id         => "child_of_red3", parent => ch1_bg1,
      self_flex  =>
       (expand_w => (pixel, 30), expand_h => (pixel, 30),
        others   => <>),
@@ -87,13 +67,13 @@ bg1 : Widget.Any_Acc :=
 
      child_of_red4 : Widget.Any_Acc :=
    Widget.Create
-    (id         => "child_of_red4", parent => child,
+    (id         => "child_of_red4", parent => ch1_bg1,
      self_flex  =>
       (expand_w => (pixel, 30), expand_h => (pixel, 30),
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
-     bgd        => HAL.Bitmap.Purple);
+     bgd        => HAL.Bitmap.Red);
 
      ch2_bg1 : Widget.Any_Acc :=
    Widget.Create
@@ -109,7 +89,7 @@ bg1 : Widget.Any_Acc :=
    Widget.Create
     (id         => "child_of_cyan1", parent => ch2_bg1,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30),
+      (expand_w => (pixel, 20), expand_h => (pixel, 20),
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
@@ -119,7 +99,7 @@ bg1 : Widget.Any_Acc :=
    Widget.Create
     (id         => "child_of_cyan2", parent => ch2_bg1,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30), align => bottom,
+      (expand_w => (pixel, 20), expand_h => (pixel, 20), align => bottom,
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
@@ -129,7 +109,7 @@ bg1 : Widget.Any_Acc :=
    Widget.Create
     (id         => "child_of_cyan3", parent => ch2_bg1,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30),
+      (expand_w => (pixel, 20), expand_h => (pixel, 20),
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
@@ -139,11 +119,11 @@ bg1 : Widget.Any_Acc :=
    Widget.Create
     (id         => "child_of_cyan4", parent => ch2_bg1,
      self_flex  =>
-      (expand_w => (pixel, 30), expand_h => (pixel, 30),
+      (expand_w => (pixel, 20), expand_h => (pixel, 20),
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
-     bgd        => HAL.Bitmap.Purple);
+     bgd        => HAL.Bitmap.Red);
 
      bg2 : Widget.Any_Acc :=
    Widget.Create
@@ -163,7 +143,7 @@ bg1 : Widget.Any_Acc :=
        others   => <>),
      child_flex =>
       (dir => left_right, gap_c => (pixel, 15), others => <>),
-     bgd        => HAL.Bitmap.Green);
+     bgd        => HAL.Bitmap.Cyan);
 
      child_of_green1 : Widget.Any_Acc :=
    Widget.Create
@@ -203,7 +183,7 @@ bg1 : Widget.Any_Acc :=
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
-     bgd        => HAL.Bitmap.Purple);
+     bgd        => HAL.Bitmap.Red);
 
      ch2_bg2 : Widget.Any_Acc :=
    Widget.Create
@@ -213,7 +193,7 @@ bg1 : Widget.Any_Acc :=
        others   => <>),
      child_flex =>
       (dir => left_right, align => bottom, others => <>),
-     bgd        => HAL.Bitmap.Pink);
+     bgd        => HAL.Bitmap.Grey);
 
      content_wid : Widget.Any_Acc :=
    Widget.Create
@@ -263,21 +243,31 @@ bg1 : Widget.Any_Acc :=
        others   => <>),
      child_flex =>
       (dir => left_right, others => <>),
-     bgd        => HAL.Bitmap.Purple);
+     bgd        => HAL.Bitmap.Red);
+
+     button_hold : Widget.Any_Acc :=
+   Widget.Create
+    (id         => "button holder", parent => ch2_bg1,
+     self_flex  =>
+      (expand_w => (pixel, 50), expand_h => (behavior => max), align => right,
+       others   => <>),
+     child_flex =>
+      (dir => top_bottom, others => <>),
+     bgd        => HAL.Bitmap.Cyan);
 
      align_button : Widget.Any_Acc :=
    Widget.Button.Switch.Create
-    (id        => "a", parent => child2, text => "Align", target => ch2_bg1,
+    (id        => "a", parent => button_hold, text => "Alignment", target => ch2_bg1,
      self_flex =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>),
-     bgd       => HAL.Bitmap.Cyan);
+      (expand_w => (pixel, 50), expand_h => (behavior => max), others => <>),
+     bgd       => HAL.Bitmap.Grey);
 
      buoy_button : Widget.Any_Acc :=
    Widget.Button.Buoy.Create
-    (id        => "b", parent => child2, text => "Buoy", target => ch2_bg1,
+    (id        => "b", parent => button_hold, text => "Buoyancy", target => ch2_bg1,
      self_flex =>
-      (expand_w => (pixel, 50), expand_h => (pixel, 50), others => <>),
-     bgd       => HAL.Bitmap.Cyan);
+      (expand_w => (pixel, 50), expand_h => (behavior => max), others => <>),
+     bgd       => HAL.Bitmap.Grey);
 
 begin
 
