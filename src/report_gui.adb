@@ -12,35 +12,22 @@ with event_handler;
 
 procedure Report_GUI is
 
-   header       : Widget.Any_Acc :=
-     Widget.Create
-       (id         => "header", parent => dui.main_widget,
-        self_flex  =>
-          (expand_w => (behavior => max), expand_h => (pixel, 30),
-           others   => <>),
-        child_flex => (dir => left_right, buoy => space_nothing, others => <>),
-        bgd        => HAL.Bitmap.Dark_Grey);
-   b1           : Widget.Any_Acc :=
-     Widget.Button.Create
-       (id        => "B1", parent => header, text => "Button 1",
-        self_flex =>
-          (expand_w => (pixel, 100), expand_h => (behavior => max),
-           others   => <>),
-        bgd       => HAL.Bitmap.Blue);
-   b2           : Widget.Any_Acc :=
-     Widget.Button.Create
-       (id        => "B2", parent => header, text => "Button 2",
-        self_flex =>
-          (expand_w => (pixel, 100), expand_h => (behavior => max),
-           others   => <>),
-        bgd       => HAL.Bitmap.Blue_Violet);
-   b3           : Widget.Any_Acc :=
-     Widget.Button.Create
-       (id        => "B3", parent => header, text => "Button 3",
-        self_flex =>
-          (expand_w => (pixel, 100), expand_h => (behavior => max),
-           others   => <>),
-        bgd       => HAL.Bitmap.Sky_Blue);
+  --   header       : Widget.Any_Acc :=
+  --     Widget.Create
+  --       (id         => "header", parent => dui.main_widget,
+  --        self_flex  =>
+  --          (expand_w => (behavior => max), expand_h => (pixel, 100),
+  --           others   => <>),
+  --        child_flex => (dir => left_right, buoy => space_nothing, others => <>),
+  --        bgd        => HAL.Bitmap.Dark_Grey);
+  --   text_example : Widget.Any_Acc :=
+  --     Widget.Text.Create
+  --       (id        => "Text", parent => header, text => "Hello hello hello hello hello",
+  --        self_flex =>
+  --          (expand_w => (behavior => max), expand_h => (behavior => max),
+  --           others   => <>),
+  --        overflow => wrap);
+
    header2      : Widget.Any_Acc :=
      Widget.Create
        (id         => "header2", parent => dui.main_widget,
@@ -55,7 +42,7 @@ procedure Report_GUI is
         self_flex  =>
           (expand_w => (pixel, 100), expand_h => (behavior => max),
            others   => <>),
-        child_flex => (dir => top_bottom, buoy => space_nothing, others => <>),
+        child_flex => (dir => top_bottom, buoy => space_nothing, align => right, others => <>),
         bgd        => HAL.Bitmap.Light_Grey);
    w2           : Widget.Any_Acc :=
      Widget.Create
@@ -63,49 +50,80 @@ procedure Report_GUI is
         self_flex  =>
           (expand_w => (behavior => max), expand_h => (behavior => max),
            others   => <>),
-        child_flex => (dir => left_right, buoy => space_nothing, others => <>),
+        child_flex => (dir => left_right, buoy => space_evenly, others => <>),
         bgd        => HAL.Bitmap.Brown);
-   w3           : Widget.Any_Acc :=
-     Widget.Create
-       (id         => "w3", parent => header2,
-        self_flex  =>
-          (expand_w => (pixel, 100), expand_h => (behavior => max),
-           others   => <>),
-        child_flex => (dir => left_right, buoy => space_nothing, others => <>),
-        bgd        => HAL.Bitmap.Light_Grey);
-   im_example   : Widget.Any_Acc :=
+  --   w3           : Widget.Any_Acc :=
+  --     Widget.Create
+  --       (id         => "w3", parent => header2,
+  --        self_flex  =>
+  --          (expand_w => (pixel, 100), expand_h => (behavior => max),
+  --           others   => <>),
+  --        child_flex => (dir => top_bottom, buoy => space_nothing, others => <>),
+  --        bgd        => HAL.Bitmap.Light_Grey);
+   im_example1   : Widget.Any_Acc :=
      Widget.Image.Create
-       (id         => "IM", parent => w2, image => "Ada",
+       (id         => "IM1", parent => w2, image => "Banana",
         self_flex  =>
-          (expand_w => (behavior => max), expand_h => (behavior => max),
+          (expand_w => (pixel, 64), expand_h => (pixel, 64),
            others   => <>),
         child_flex => (dir => left_right, others => <>),
         bgd        => HAL.Bitmap.Green);
-   text_example : Widget.Any_Acc :=
-     Widget.Text.Create
-       (id        => "Text", parent => w3, text => "Hello",
+   im_example2   : Widget.Any_Acc :=
+     Widget.Image.Create
+       (id         => "IM2", parent => w2, image => "Banana",
+        self_flex  =>
+          (expand_w => (pixel, 64), expand_h => (pixel, 64),
+           others   => <>),
+        child_flex => (dir => left_right, others => <>),
+        bgd        => HAL.Bitmap.Green);
+   im_example3   : Widget.Any_Acc :=
+     Widget.Image.Create
+       (id         => "IM3", parent => w2, image => "Banana",
+        self_flex  =>
+          (expand_w => (pixel, 64), expand_h => (pixel, 64),
+           others   => <>),
+        child_flex => (dir => left_right, others => <>),
+        bgd        => HAL.Bitmap.Green);
+   b1           : Widget.Any_Acc :=
+     Widget.Button.Create
+       (id        => "B1", parent => w1, text => "B1",
         self_flex =>
-          (expand_w => (behavior => max), expand_h => (behavior => max),
-           others   => <>));
+          (expand_w => (pixel, 30), expand_h => (pixel, 30), align => left,
+           others   => <>),
+        bgd       => HAL.Bitmap.Blue);
+   b2           : Widget.Any_Acc :=
+     Widget.Button.Create
+       (id        => "B2", parent => w1, text => "B2",
+        self_flex =>
+          (expand_w => (pixel, 30), expand_h => (pixel, 30),
+           others   => <>),
+        bgd       => HAL.Bitmap.Blue_Violet);
+   b3           : Widget.Any_Acc :=
+     Widget.Button.Create
+       (id        => "B3", parent => w1, text => "B3",
+        self_flex =>
+          (expand_w => (pixel, 30), expand_h => (pixel, 30), align => left,
+           others   => <>),
+        bgd       => HAL.Bitmap.Sky_Blue);
    bt_example1  : Widget.Any_Acc :=
      Widget.Button.Create
-       (id        => "BT1", parent => w1, text => "Button 4",
+       (id        => "BT1", parent => w1, text => "B4",
         self_flex =>
-          (expand_w => (behavior => max), expand_h => (pixel, 30),
+          (expand_w => (pixel, 30), expand_h => (pixel, 30),
            others   => <>),
         bgd       => HAL.Bitmap.Red);
    bt_example2  : Widget.Any_Acc :=
      Widget.Button.Create
-       (id        => "BT2", parent => w1, text => "Button 5",
+       (id        => "BT2", parent => w1, text => "B5",
         self_flex =>
-          (expand_w => (behavior => max), expand_h => (pixel, 30),
+          (expand_w => (pixel, 30), expand_h => (pixel, 30), align => left,
            others   => <>),
         bgd       => HAL.Bitmap.Dark_Red);
    bt_example3  : Widget.Any_Acc :=
      Widget.Button.Create
-       (id        => "BT3", parent => w1, text => "Button 6",
+       (id        => "BT3", parent => w1, text => "B6",
         self_flex =>
-          (expand_w => (behavior => max), expand_h => (pixel, 30),
+          (expand_w => (pixel, 30), expand_h => (pixel, 30),
            others   => <>),
         bgd       => HAL.Bitmap.Pale_Violet_Red);
 begin
