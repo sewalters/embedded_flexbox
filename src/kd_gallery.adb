@@ -10,6 +10,7 @@ with Ada.Finalization; use Ada.Finalization;
 with STM32.Board;      use STM32.Board;
 with embedded_view;    use embedded_view;
 with event_handler;
+with BMP_Fonts; use BMP_Fonts;
 
 procedure kd_gallery is
 header : Widget.Any_Acc :=
@@ -32,20 +33,65 @@ header : Widget.Any_Acc :=
       (dir => left_right, align => center, buoy => space_around, others => <>),
      bgd        => HAL.Bitmap.Grey);
 
+     im_left   : Widget.Any_Acc :=
+     Widget.Image.Create
+       (id         => "IM", parent => image_hold, image => "spark",
+        self_flex  =>
+          (expand_w => (pixel, 75), expand_h => (pixel, 75),
+           others   => <>),
+        child_flex => (dir => left_right, others => <>),
+        bgd        => HAL.Bitmap.Green);
+
      im_example   : Widget.Any_Acc :=
      Widget.Image.Create
-       (id         => "IM", parent => image_hold, image => "Ada",
+       (id         => "IM", parent => image_hold, image => "ada",
         self_flex  =>
           (expand_w => (pixel, 150), expand_h => (pixel, 150),
            others   => <>),
         child_flex => (dir => left_right, others => <>),
         bgd        => HAL.Bitmap.Green);
 
+        im_right   : Widget.Any_Acc :=
+     Widget.Image.Create
+       (id         => "IM", parent => image_hold, image => "psu_shield",
+        self_flex  =>
+          (expand_w => (pixel, 75), expand_h => (pixel, 75),
+           others   => <>),
+        child_flex => (dir => left_right, others => <>),
+        bgd        => HAL.Bitmap.Green);
+
+        text_hold : Widget.Any_Acc :=
+   Widget.Create
+    (id         => "header", parent => header,
+     self_flex  =>
+      (expand_w => (behavior => max), expand_h => (pixel, 50),
+       others   => <>),
+     child_flex =>
+      (dir => left_right, buoy => space_around, others => <>),
+     bgd        => HAL.Bitmap.Grey);
+
+     widg : Widget.Any_Acc :=
+   Widget.Create
+    (id         => "header", parent => text_hold,
+     self_flex  =>
+      (expand_w => (pixel, 200), expand_h => (pixel, 50),
+       others   => <>),
+     child_flex =>
+      (dir => left_right, others => <>),
+     bgd        => HAL.Bitmap.Grey);
+
+     text_example : Widget.Any_Acc :=
+     Widget.Text.Create
+       (id        => "Text", parent => text_hold, text => "Ada Logo",
+        self_flex =>
+          (expand_w => (behavior => max), expand_h => (behavior => max),
+           others   => <>));
+
     image_button : Widget.Any_Acc :=
    Widget.Button.Image.Create
-    (id        => "a", parent => header, text => "Change Me", target => im_example,
+    (id        => "a", parent => header, text => "Change Me", target => im_example, image_left => im_left, image_right => im_right, gallery_text => text_example,
      self_flex =>
-      (expand_w => (behavior => max), expand_h => (pixel, 50), others => <>),
+      (expand_w => (behavior => max), expand_h => (pixel, 60), others => <>),
      bgd       => HAL.Bitmap.Cyan);
 
 begin

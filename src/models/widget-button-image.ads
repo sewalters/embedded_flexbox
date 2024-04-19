@@ -11,11 +11,17 @@ package Widget.Button.Image is
    with record
       
       target: Widget.Any_Acc;
+      image_left : Widget.Any_Acc;
+      image_right: Widget.Any_Acc;
+      gallery_text : Widget.Any_Acc;
    end record;
 
    function Create (id            : string;
                     parent        : Widget.Any_Acc;
                     target        : Widget.Any_Acc;
+                    image_left    : Widget.Any_Acc;
+                    image_right   : Widget.Any_Acc;
+                    gallery_text : Widget.Any_Acc;
                     text          : string := "";
                     overflow_text : text_overflow := truncate;
                     self_flex     : flex_t  := default_flex;

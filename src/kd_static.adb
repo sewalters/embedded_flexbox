@@ -43,7 +43,7 @@ bg1 : Widget.Any_Acc :=
        others   => <>),
      child_flex =>
       (dir => left_right, buoy => space_around, align => center, others => <>),
-     bgd        => HAL.Bitmap.Grey);
+     bgd        => HAL.Bitmap.Dark_Grey);
 
      child_of_red1 : Widget.Any_Acc :=
    Widget.Create
@@ -90,21 +90,21 @@ bg1 : Widget.Any_Acc :=
     (id        => "a", parent => button_hold, text => "Alignment", target => widg_hold,
      self_flex =>
       (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
-     bgd       => HAL.Bitmap.Cyan);
+     bgd       => HAL.Bitmap.Dark_Green);
 
      buoy_button : Widget.Any_Acc :=
    Widget.Button.Buoy.Create
     (id        => "b", parent => button_hold, text => "Buoyancy", target => widg_hold,
      self_flex =>
       (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
-     bgd       => HAL.Bitmap.Cyan);
+     bgd       => HAL.Bitmap.Dark_Blue);
 
      dir_button : Widget.Any_Acc :=
    Widget.Button.Dir.Create
     (id        => "b", parent => button_hold, text => "Direction", target => widg_hold,
      self_flex =>
       (expand_w => (behavior => max), expand_h => (behavior => max), others => <>),
-     bgd       => HAL.Bitmap.Cyan);
+     bgd       => HAL.Bitmap.Dark_Red);
 
 begin
 
