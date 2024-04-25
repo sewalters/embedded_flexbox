@@ -86,10 +86,13 @@ package body Widget is
    begin
         if new_width > Parent.w then
             This.self_flex.expand_w := (pixel, Parent.w);
+            This.w := Parent.w;
         elsif new_width < 1 then
             This.self_flex.expand_w := (pixel, 1);
+            This.w := 1;
         else
             This.self_flex.expand_w := (pixel, new_width);
+            This.w := new_width;
         end if;
         return This.self_flex.expand_w.pixel;
    end Set_Event_Override_Width;
@@ -97,10 +100,13 @@ package body Widget is
     begin
         if new_height > Parent.h then
             This.self_flex.expand_h := (pixel, Parent.h);
+            This.h := Parent.h;
         elsif new_height < 1 then
             This.self_flex.expand_h := (pixel, 1);
+            This.h := 1;
         else
             This.self_flex.expand_h := (pixel, new_height);
+            This.h := new_height;
         end if;
         return This.self_flex.expand_h.pixel;
     end Set_Event_Override_Height;

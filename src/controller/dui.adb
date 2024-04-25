@@ -901,10 +901,10 @@ package body dui is
 
                             case LOT_Parent.child_flex.dir is
                                 when left_right | right_left =>
-                                    LOT (i).y := (LOT_ph - LOT (i).h) / 2;
+                                    LOT (i).y := (LOT_Parent.y + (LOT_ph / 2) - (LOT (i).h / 2));
 
                                 when bottom_top | top_bottom =>
-                                    LOT (i).x :=
+                                    LOT (i).x := LOT_Parent.x + 
                                        (LOT_pw / 2) - (LOT (i).w / 2);
 
                                 when others =>
