@@ -1,14 +1,25 @@
-with dui;              use dui;
-with Widget;           use Widget;
-with Widget.Text;      use Widget.Text;
-with Widget.Image;     use Widget.Image;
-with Widget.Button;    use Widget.Button;
-with HAL;              use HAL;
-with HAL.Bitmap;       use HAL.Bitmap;
-with Ada.Finalization; use Ada.Finalization;
-with STM32.Board;      use STM32.Board;
-with embedded_view;    use embedded_view;
+with dui;                     use dui;
+
+with Widget;                  use Widget;
+with Widget.Text;             use Widget.Text;
+with Widget.Image;            use Widget.Image;
+with Widget.Button;           use Widget.Button;
+
+with HAL;                     use HAL;
+with HAL.Bitmap;              use HAL.Bitmap;
+
+with Ada.Finalization;        use Ada.Finalization;
+with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
+
+with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
+with BMP_Fonts;               use BMP_Fonts;
+
+with STM32.Board;             use STM32.Board;
+
+with embedded_view;           use embedded_view;
 with event_handler;
+
+with Bitmapped_Drawing;
 
 procedure Report_GUI is
 

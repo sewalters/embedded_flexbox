@@ -7,7 +7,7 @@ with Widget_Observer;
 package body Widget.Button.Image is
 
     function Create (id            : string;
-                     Parent        : Widget.Any_acc;
+                     parent        : Widget.Any_acc;
                      target        : Widget.Any_Acc;
                      image_left    : Widget.Any_Acc;
                      image_right   : Widget.Any_Acc;
@@ -50,10 +50,10 @@ package body Widget.Button.Image is
         
         if text /= "" then
         Button.Any_Acc(this).button_text := 
-            Widget.Text.Create
+            Widget.Text.Any_Acc(Widget.Text.Create
             (id        => id & ".text", parent => this, text => text, overflow => overflow_text,
             self_flex =>
-                (expand_w => (behavior => max), expand_h => (behavior => max), others => <>));
+                (expand_w => (behavior => max), expand_h => (behavior => max), others => <>)));
         end if;
         return This;
     end;
