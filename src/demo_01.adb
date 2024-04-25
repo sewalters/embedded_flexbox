@@ -21,7 +21,7 @@ with event_handler;
 
 with Bitmapped_Drawing;
 
-procedure demo is
+procedure demo_01 is
 
   header : Widget.Any_Acc :=
    Widget.Create
@@ -78,4 +78,4 @@ begin
 
   dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 
-end demo;
+end demo_01;

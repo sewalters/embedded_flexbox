@@ -24,7 +24,7 @@ with event_handler;
 
 with Bitmapped_Drawing;
 
-procedure kd_static is
+procedure Flexbox_Features is
 
 bg1 : Widget.Any_Acc :=
    Widget.Create
@@ -121,4 +121,4 @@ begin
 
     dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 
-end kd_static;
+end Flexbox_Features;

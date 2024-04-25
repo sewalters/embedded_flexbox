@@ -22,7 +22,7 @@ with event_handler;
 
 with Bitmapped_Drawing;
 
-procedure typewriter is
+procedure Typewriter is
 
   canvas : Widget.Any_Acc := Widget.Create(id => "canvas", 
             parent => dui.main_widget, 
@@ -88,4 +88,4 @@ begin
 
    dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 
-end typewriter;
+end Typewriter;

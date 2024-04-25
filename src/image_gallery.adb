@@ -22,7 +22,7 @@ with event_handler;
 
 with Bitmapped_Drawing;
 
-procedure kd_gallery is
+procedure Image_Gallery is
 header : Widget.Any_Acc :=
    Widget.Create
     (id         => "header", parent => dui.main_widget,
@@ -108,4 +108,4 @@ begin
 
 dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
 
-end kd_gallery;
+end Image_Gallery;
