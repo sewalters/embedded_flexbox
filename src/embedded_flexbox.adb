@@ -1,14 +1,25 @@
-with dui;              use dui;
-with Widget;           use Widget;
-with Widget.Text;      use Widget.Text;
-with Widget.Image;     use Widget.Image;
-with Widget.Button;    use Widget.Button;
-with HAL;              use HAL;
-with HAL.Bitmap;       use HAL.Bitmap;
-with Ada.Finalization; use Ada.Finalization;
-with STM32.Board;      use STM32.Board;
-with embedded_view;    use embedded_view;
+with dui;                     use dui;
+
+with Widget;                  use Widget;
+with Widget.Text;             use Widget.Text;
+with Widget.Image;            use Widget.Image;
+with Widget.Button;           use Widget.Button;
+
+with HAL;                     use HAL;
+with HAL.Bitmap;              use HAL.Bitmap;
+
+with Ada.Finalization;        use Ada.Finalization;
+with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
+
+with Bitmap_Color_Conversion; use Bitmap_Color_Conversion;
+with BMP_Fonts;               use BMP_Fonts;
+
+with STM32.Board;             use STM32.Board;
+
+with embedded_view;           use embedded_view;
 with event_handler;
+
+with Bitmapped_Drawing;
 
 procedure Embedded_Flexbox is
 
@@ -90,7 +101,7 @@ procedure Embedded_Flexbox is
   --   head_t2 : Widget.Any_Acc := Widget.Text.Create(id => "text2", parent => header2, text => "2nd inserted, prio 10.");
   --   head_t3 : Widget.Any_Acc := Widget.Text.Create(id => "text3", parent => header3, text => "3rd inserted, prio 5.");
   --   head_t4 : Widget.Any_Acc := Widget.Text.Create(id => "text4", parent => header4, text => "4th inserted, prio 0.");
-
+ 
 begin
 
   dui.render (STM32.Board.Display.Width, STM32.Board.Display.Height);
