@@ -1,4 +1,20 @@
-# Embedded Flexbox Engine in Ada (Alire) (Temporary Description)
+# Embedded, Baremetal, CSS Flexbox (in Ada)
+
+A brief description of what this project does and who it's for
+
+## Authors
+
+- [Stuart Walters](https://github.com/sewalters)
+- [Kien Nguyen](https://github.com/KNguyen5256)
+- [John Shimer](https://github.com/Utavon)
+- [Dominick Carlucci](https://github.com/DomCarl)
+
+## Acknowledgements
+
+ - Dr. Nasim Ibrahim
+ - Olivier Henley
+ - [AdaCore](https://www.adacore.com)
+ - [Penn State College of Engineering](https://www.psu.edu)
 
 ## Prerequisite
 
@@ -8,6 +24,16 @@
     - `sudo apt install openocd`
 - Development board:
     - STM32F746disco
+
+## How to Setup Environment
+The set-up instructions make the following assumptions: 
+- Users are working in a Windows environment
+- Users know and have already set up a new 64-but Ubuntu v20.04 virtual machine (VM)
+- Users are familiar with terminal commands
+- Users know how to use Git
+To begin setting the development environment for DUI:
+- In Figure 39, on the left-hand side of the Ubuntu VM screen, click and open the Firefox browser.
+![Figure 39](Images/image40.png)
 
 ### Fetch the Crate (Not Published Yet?)
 ```console
@@ -40,7 +66,7 @@ gnatstudio embedded_flexbox.gpr
 ### Program to Board
 
 ```console
-openocd -f /usr/share/openocd/scripts/board/stm32f7discovery.cfg -c 'program bin/embedded_flexbox verify reset exit'
+openocd -f /usr/share/openocd/scripts/board/stm32f7discovery.cfg -c 'program bin/your_main_here verify reset exit'
 ```    
 
 ## Additional Notes
