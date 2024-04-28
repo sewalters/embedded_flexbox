@@ -30,7 +30,7 @@ AdaCore additionally wants to advertise the Ada programming language to a wider 
 ![Figure 39](Images/image40.png "Figure 39")
 2. As shown in Figure 40 go to https://alire.ada.dev/ and click "Download Alire for Linux" for a .zip
 ![Figure 40](Images/image78.png "Figure 40")
-3. Minimize Firefox and click on the grid of nine squares in the bottom left corner of the screen as shown in Figure 41.
+3. Minimize Firefox and click on the grid of nine squares in the bottom left corner of the screen as shown in Figure 41.  
 ![Figure 41](Images/image113.png "Figure 41")
 4. Find and open the Terminal application which is circled in Figure 42.
 ![Figure 42](Images/image135.png "Figure 42")
@@ -68,7 +68,7 @@ AdaCore additionally wants to advertise the Ada programming language to a wider 
 ![Figure 52](Images/image68.png "Figure 52")
 25. In the search bar, find and install these extensions: ```Ada & SPARK``` and ```CodeLLDB``` as shown in Figure 53 and Figure 53a respectively.  
     1. Installing the Ada extension will also install ```C/C++```.
-![Figure 53](Images/image54.png "Figure 53")
+![Figure 53](Images/image54.jpg "Figure 53")
 ![Figure 53a](Images/image102.png "Figure 53a")
 26. Once the extensions are installed, close out of VS Code and return to the terminal.  
 27. Do ```sudo apt install git```.  
@@ -102,11 +102,11 @@ The subsequent steps are targeted to start deploying and developing code on the 
 2. Type out the following command: ```alr index --add git+https://github.com/GNAT-Academic-Program/alire-index --name gap``` as shown in Figure 55. Once complete, press “Enter”.
     1. Once you are done with the project, enter ```alr index --del gap```
 ![Figure 55](Images/image93.png "Figure 55")
-3. Next, type the command ```sudo apt install openocd``` as depicted in Figure 56 to install OpenOCD. Press “Enter” once typed out.
+3. Next, type the command ```sudo apt install openocd``` as depicted in Figure 56 to install OpenOCD. Press “Enter” once typed out.  
 ![Figure 56](Images/image66.png "Figure 56")
 4. Run ```alr toolchain --select``` and install ```gnat_arm_elf``` version ```12.2.1``` and select ```none``` for the gprbuild.  
 5. Now, plug in your stm32f7 discovery board using a USB MINI B cable into your computer (See below in Figure 57).
-![Figure 57](Images/image43.png "Figure 57")
+![Figure 57](Images/image43.jpg "Figure 57")
 6. In Figure 58, you will receive a prompt on your VM asking which machine you would like the device to connect to. Select the “Connect to a virtual machine” radio button and click “OK”.
 ![Figure 58](Images/image111.png "Figure 58")
 7. Then, clone the embedded_flexbox GitHub repo with this command as shown in Figure 59: ```git clone https://github.com/sewalters/embedded_flexbox```. Click “Enter” once complete.
