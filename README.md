@@ -14,7 +14,7 @@ AdaCore additionally wants to advertise the Ada programming language to a wider 
 
 ## Acknowledgements
 
- - Dr. Nasim Ibrahim
+ - Dr. Naseem Ibrahim
  - Olivier Henley
  - [AdaCore](https://www.adacore.com)
  - [Penn State College of Engineering](https://www.psu.edu)
