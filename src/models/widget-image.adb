@@ -34,38 +34,6 @@ package body Widget.Image is
         return This;
     end Create;
 
---      overriding procedure Draw(This : in out Instance; img : in out Bitmap_Buffer'Class) is
---      use dui;
---      image_Acc : Texture_Access := Texture_Factory.procure_texture(+This.image);
---      targetWidth : constant Natural := This.w;  -- Target width of the downsized image
---      targetHeight : constant Natural := This.h; -- Target height of the downsized image
---      originalWidth : constant Natural := image_Acc'Length;  -- Original width of the image
---      originalHeight : constant Natural := image_Acc'Length(1); -- Original height of the image
---      scaleX : constant Float := Float(originalWidth) / Float(targetWidth);   -- X-axis scaling factor
---      scaleY : constant Float := Float(originalHeight) / Float(targetHeight); -- Y-axis scaling factor
---      begin
---      for targetY in 1 .. targetHeight loop
---          for targetX in 1 .. targetWidth loop
---              declare
---              -- Calculate corresponding coordinates in the original image
---              originalX : constant Integer := Integer(Float(targetX - 1) * scaleX);
---              originalY : constant Integer := Integer(Float(targetY - 1) * scaleY);
-            
---              -- Get the nearest pixel color from the original image
---              nearestX : constant Integer := originalX + 1;
---              nearestY : constant Integer := originalY + 1;
---              nearestColor : Bitmap_Color := Word_To_Bitmap_Color(Mode => ARGB_1555, Col => UInt32(image_Acc(nearestX)(nearestY)));
---              begin
-            
---              -- Draw the nearest color at the corresponding memory address linked to the LCD screen
---              img.Set_Source(nearestColor);
---              img.Set_Pixel(Pt => (This.x + targetX, This.y + targetY));
---              end;
---          end loop;
---      end loop;
---  end Draw;
-
-
     overriding procedure Draw
        (This : in out Instance; img : in out Bitmap_Buffer'Class)
     is

@@ -21,8 +21,6 @@ package Widget is
 
    type expand_t (behavior : behavior_t := max) is record
       case behavior is
-         --when content =>
-         --   content : Positive;
          when portion =>
             portion : Positive;
          when pixel =>
